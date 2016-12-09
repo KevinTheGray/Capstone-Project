@@ -1,0 +1,49 @@
+# mac system
+.DS_Store
+.Spotlight-V100
+.Trashes
+*.swp
+*~.nib
+
+# android studio / project specific
+*.iml
+*.iws
+*.ipr
+/local.properties
+/.idea/libraries
+/.idea/dictionaries
+/.idea/gradle.xml
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/vcs.xml
+/.idea/jsLibraryMappings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+.idea/encodings.xml
+
+# Build locations
+.gradle
+/dist
+build/
+captures/
+gen/
+bin/
+.externalNativeBuild
+
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Proguard
+proguard/
+proguard_logs/
+
+# configuration files
+/app/signing.gradle
+
+# script artifacts
+./scripts/temp
+
