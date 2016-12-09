@@ -3,26 +3,30 @@ package udacity.kevin.podcastmaster.activities;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import udacity.kevin.podcastmaster.AnalyticsApplication;
+import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
 
 public class MainActivity extends AppCompatActivity
   implements NavigationView.OnNavigationItemSelectedListener {
 
   private Tracker mTracker;
+  InterstitialAd mInterstitialAd;
   private final String LOG_TAG = "MainActivity";
   private final String SCREEN_NAME = "MainActivity";
 
@@ -37,8 +41,11 @@ public class MainActivity extends AppCompatActivity
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-          .setAction("Action", null).show();
+        if (mInterstitialAd.isLoaded()) {
+          mInterstitialAd.show();
+        } else {
+          Log.d(LOG_TAG, "Start download");
+        }
       }
     });
 
@@ -52,8 +59,21 @@ public class MainActivity extends AppCompatActivity
     navigationView.setNavigationItemSelectedListener(this);
 
     // Obtain the shared Tracker instance.
-    AnalyticsApplication application = (AnalyticsApplication) getApplication();
+    PodcastMasterApplication application = (PodcastMasterApplication) getApplication();
     mTracker = application.getDefaultTracker();
+
+    mInterstitialAd = new InterstitialAd(this);
+    mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+    mInterstitialAd.setAdListener(new AdListener() {
+      @Override
+      public void onAdClosed() {
+        super.onAdClosed();
+        requestNewInterstitial();
+      }
+    });
+
+    requestNewInterstitial();
   }
 
   @Override
@@ -119,5 +139,13 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     drawer.closeDrawer(GravityCompat.START);
     return true;
+  }
+
+  private void requestNewInterstitial() {
+    AdRequest adRequest = new AdRequest.Builder()
+      .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+      .build();
+
+    mInterstitialAd.loadAd(adRequest);
   }
 }
