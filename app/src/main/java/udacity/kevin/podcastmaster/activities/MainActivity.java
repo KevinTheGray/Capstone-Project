@@ -1,10 +1,9 @@
-package udacity.kevin.podcastmaster;
+package udacity.kevin.podcastmaster.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,9 +11,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
+import udacity.kevin.podcastmaster.AnalyticsApplication;
+import udacity.kevin.podcastmaster.R;
 
 public class MainActivity extends AppCompatActivity
   implements NavigationView.OnNavigationItemSelectedListener {
+
+  private Tracker mTracker;
+  private final String LOG_TAG = "MainActivity";
+  private final String SCREEN_NAME = "MainActivity";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +50,10 @@ public class MainActivity extends AppCompatActivity
 
     NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
     navigationView.setNavigationItemSelectedListener(this);
+
+    // Obtain the shared Tracker instance.
+    AnalyticsApplication application = (AnalyticsApplication) getApplication();
+    mTracker = application.getDefaultTracker();
   }
 
   @Override
@@ -57,6 +71,14 @@ public class MainActivity extends AppCompatActivity
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     return true;
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    // Track the screen
+    mTracker.setScreenName(SCREEN_NAME);
+    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
   @Override

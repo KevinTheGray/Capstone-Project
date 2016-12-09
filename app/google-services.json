@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "465247939361",
+    "project_id": "podcast-master"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465247939361:android:e43613c15f7498ac",
+        "android_client_info": {
+          "package_name": "udacity.kevin.podcastmaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7wXfKrlfD_fuH1fXelHC77dwbQrSxlec"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-88792741-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
