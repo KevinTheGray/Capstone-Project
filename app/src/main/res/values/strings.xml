@@ -1,10 +1,14 @@
 <resources>
-	<string name="app_name">PodcastMaster</string>
+	<string name="app_name">Podcast Master</string>
 
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 
 	<string name="action_settings">Settings</string>
+
+	<!-- Menu -->
+	<string name="menu_drawer_my_feeds" translatable="true">My Feeds</string>
+	<string name="menu_drawer_my_downloads" translatable="true">My Downloads</string>
 
 	<string name="test_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 </resources>
