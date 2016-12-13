@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- todo: add preview   android:previewImage="@drawable/preview" -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+					android:minWidth="250dp"
+					android:minHeight="40dp"
+					android:minResizeWidth="250dp"
+					android:updatePeriodMillis="86400000"
+					android:initialLayout="@layout/widget_play_control"
+					android:resizeMode="horizontal"
+					android:widgetCategory="home_screen">
+</appwidget-provider>
