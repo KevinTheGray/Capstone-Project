@@ -1,8 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="vertical"
-			  android:background="@color/colorPrimaryDark"
 			  android:layout_width="match_parent"
-			  android:layout_height="match_parent">
+			  android:layout_height="match_parent"
+			  android:background="#66000000"
+			  android:orientation="horizontal">
+	<LinearLayout android:layout_width="0dp"
+				  android:layout_height="wrap_content"
+				  android:layout_gravity="center_vertical"
+				  android:layout_weight="1"
+				  android:orientation="vertical">
+
+		<TextView android:id="@+id/text_view_podcast_title"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:text="@string/default_widget_podcast_title"
+				  android:textColor="@color/widget_podcast_title_color"
+				  android:layout_marginStart="@dimen/widget_title_margin_start"
+				  android:maxLines="1"
+				  android:textSize="@dimen/widget_podcast_title_text"/>
+
+		<TextView android:id="@+id/text_view_episode_title"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:text="@string/default_widget_episode_title"
+				  android:textColor="@color/widget_episode_title_color"
+				  android:layout_marginStart="@dimen/widget_title_margin_start"
+				  android:textSize="@dimen/widget_episode_title_text"/>
+
+	</LinearLayout>
+
+	<ImageButton android:id="@+id/button_previous_control"
+				 android:layout_width="@dimen/widget_buttons_width"
+				 android:layout_height="match_parent"
+				 android:contentDescription="@string/content_description_previous_control_button"
+				 android:background="#00000000"
+				 android:src="@drawable/ic_replay_10_white_24dp"
+	/>
+
+
+	<ImageButton android:id="@+id/button_play_control"
+				 android:layout_width="@dimen/widget_buttons_width"
+				 android:layout_height="match_parent"
+				 android:contentDescription="@string/content_description_play_control_button"
+				 android:background="#00000000"
+				 android:src="@drawable/ic_play_arrow_white_24dp"
+	/>
+
+	<ImageButton android:id="@+id/button_next_control"
+				 android:layout_width="@dimen/widget_buttons_width"
+				 android:layout_height="match_parent"
+				 android:src="@drawable/ic_forward_10_white_24dp"
+				 android:background="#00000000"
+				 android:contentDescription="@string/content_description_next_control_button"
+	/>
 
 </LinearLayout>

@@ -3,4 +3,8 @@
 	<color name="colorPrimary">#9E9E9E</color>
 	<color name="colorPrimaryDark">#616161</color>
 	<color name="colorAccent">#607D8B</color>
+
+	<!-- Widget Colors -->
+	<color name="widget_podcast_title_color">#FFFFFF</color>
+	<color name="widget_episode_title_color">#FFFFFF</color>
 </resources>

@@ -11,4 +11,13 @@
 	<string name="menu_drawer_my_downloads" translatable="true">My Downloads</string>
 
 	<string name="test_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
+	<!-- Default strings -->
+	<string name="default_widget_podcast_title" translatable="true">No available media</string>
+	<string name="default_widget_episode_title" translatable="true">Download some episodes!</string>
+
+	<!-- Content Descriptions -->
+	<string name="content_description_play_control_button" translatable="true">Play Control Button</string>
+	<string name="content_description_previous_control_button" translatable="true">Seek 10 Previous Control Button</string>
+	<string name="content_description_next_control_button" translatable="true">Seek 10 Next Control Button</string>
 </resources>

@@ -31,6 +31,15 @@
 					   android:resource="@xml/play_control_widget_info" />
 		</receiver>
 
+		<receiver android:name=".receivers.WidgetBroadcastReceiver"
+				  android:exported="false">
+			<intent-filter>
+				<action android:name="udacity.kevin.podcastmaster.PLAY_CONTROL_ACTION" />
+				<action android:name="udacity.kevin.podcastmaster.SEEK_FORWARD_ACTION" />
+				<action android:name="udacity.kevin.podcastmaster.SEEK_BACKWARD_ACTION" />
+			</intent-filter>
+		</receiver>
+
 	</application>
 
 </manifest>
