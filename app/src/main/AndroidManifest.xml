@@ -32,11 +32,12 @@
 		</receiver>
 
 		<receiver android:name=".receivers.WidgetBroadcastReceiver"
-				  android:exported="false">
+				  android:exported="true">
 			<intent-filter>
 				<action android:name="udacity.kevin.podcastmaster.PLAY_CONTROL_ACTION" />
 				<action android:name="udacity.kevin.podcastmaster.SEEK_FORWARD_ACTION" />
 				<action android:name="udacity.kevin.podcastmaster.SEEK_BACKWARD_ACTION" />
+				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</receiver>
 
