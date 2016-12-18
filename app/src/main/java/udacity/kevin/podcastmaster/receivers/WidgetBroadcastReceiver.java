@@ -8,6 +8,6 @@ import android.util.Log;
 public class WidgetBroadcastReceiver extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
-    Log.d("YEAH!", "YEAH!");
+    Log.d("YEAH!", intent.getAction());
   }
 }
