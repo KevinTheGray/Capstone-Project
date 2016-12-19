@@ -1,11 +1,14 @@
 package udacity.kevin.podcastmaster.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,15 +18,28 @@ import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedReceiver;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedService;
 
-public class MyFeedsFragment extends Fragment {
+public class MyFeedsFragment extends Fragment implements
+  DownloadRSSFeedReceiver.DownloadRSSFeedReceiverCallback {
 
+  public static final String FRAGMENT_TAG = "MyFeedsFragment";
   private final String LOG_TAG = "MyFeedsFragment";
+  private DownloadRSSFeedReceiver mDownloadRSSFeedReceiver;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    IntentFilter downloadRSSFeedIntentFilter = new IntentFilter();
+    downloadRSSFeedIntentFilter.addAction(DownloadRSSFeedService.BROADCAST_UPDATE_ACTION);
+    downloadRSSFeedIntentFilter.addAction(DownloadRSSFeedService.BROADCAST_FINISHED_ACTION);
+
+    mDownloadRSSFeedReceiver = new DownloadRSSFeedReceiver();
+    LocalBroadcastManager.getInstance(getContext()).registerReceiver(
+      mDownloadRSSFeedReceiver, downloadRSSFeedIntentFilter);
+      mDownloadRSSFeedReceiver.setCallback(this);
   }
 
   @Nullable
@@ -55,4 +71,15 @@ public class MyFeedsFragment extends Fragment {
     return rootView;
   }
 
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    mDownloadRSSFeedReceiver.setCallback(null);
+    LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mDownloadRSSFeedReceiver);
+  }
+
+  @Override
+  public void onDownloadRSSFeedIntentReceived(Context context, Intent intent) {
+    Log.d(LOG_TAG, intent.getAction());
+  }
 }
