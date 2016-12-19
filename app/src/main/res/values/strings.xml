@@ -16,6 +16,12 @@
 	<string name="default_widget_podcast_title" translatable="true">No available media</string>
 	<string name="default_widget_episode_title" translatable="true">Download some episodes!</string>
 
+	<!-- My Feeds -->
+	<string name="add_feed_dialog_title">Add RSS Feed</string>
+	<string name="add_feed_dialog_content">Enter the URL of an RSS feed you are interested in to add it to your feeds!</string>
+	<string name="add_feed_dialog_hint">URL of RSS Feed</string>
+	<string name="add_feed_dialog_negative">Cancel</string>
+
 	<!-- Content Descriptions -->
 	<string name="content_description_play_control_button" translatable="true">Play Control Button</string>
 	<string name="content_description_previous_control_button" translatable="true">Seek 10 Previous Control Button</string>

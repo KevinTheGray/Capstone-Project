@@ -41,6 +41,9 @@
 			</intent-filter>
 		</receiver>
 
+		<service
+			android:name=".networking.downloadrssfeed.DownloadRSSFeedService"
+			android:exported="false"/>
 	</application>
 
 </manifest>
