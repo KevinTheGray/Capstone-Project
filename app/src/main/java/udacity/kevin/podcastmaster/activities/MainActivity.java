@@ -1,17 +1,16 @@
 package udacity.kevin.podcastmaster.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -21,6 +20,7 @@ import com.google.android.gms.analytics.Tracker;
 
 import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
 
 public class MainActivity extends AppCompatActivity
   implements NavigationView.OnNavigationItemSelectedListener {
@@ -36,19 +36,6 @@ public class MainActivity extends AppCompatActivity
     setContentView(R.layout.activity_main);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-
-
-    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (mInterstitialAd.isLoaded()) {
-          mInterstitialAd.show();
-        } else {
-          Log.d(LOG_TAG, "Start download");
-        }
-      }
-    });
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -75,6 +62,13 @@ public class MainActivity extends AppCompatActivity
     });
 
     requestNewInterstitial();
+
+    // Todo: Handle tablet layout
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    MyFeedsFragment myFeedsFragment = new MyFeedsFragment();
+    fragmentTransaction.add(R.id.fragment_container, myFeedsFragment);
+    fragmentTransaction.commit();
   }
 
   @Override
