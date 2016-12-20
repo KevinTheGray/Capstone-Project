@@ -22,6 +22,15 @@
 	<string name="add_feed_dialog_hint">URL of RSS Feed</string>
 	<string name="add_feed_dialog_negative">Cancel</string>
 
+	<!-- Exception messages -->
+	<string name="download_rss_feed_exception_invalid_url_supplied" translatable="true">
+		Sorry, that is not a valid URL! (%d)
+	</string>
+
+	<string name="unknown_exception_code" translatable="true">
+		Sorry, an error has occurred!  No further information is available.  Please try again. (%d)
+	</string>
+
 	<!-- Content Descriptions -->
 	<string name="content_description_play_control_button" translatable="true">Play Control Button</string>
 	<string name="content_description_previous_control_button" translatable="true">Seek 10 Previous Control Button</string>

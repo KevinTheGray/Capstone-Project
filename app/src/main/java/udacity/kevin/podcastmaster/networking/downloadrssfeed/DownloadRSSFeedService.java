@@ -14,11 +14,15 @@ public class DownloadRSSFeedService extends IntentService {
   public final static String BROADCAST_FINISHED_ACTION =
     "udacity.kevin.podcastmaster.downloadrssfeedservice.FINISHED";
 
+  public final static String INTENT_EXTRA_KEY_RSS_URL =
+    "udacity.kevin.podcastmaster.downloadrssfeedservice.FINISHED";
+
   public DownloadRSSFeedService() {
     super("DownloadRSSFeedService");
   }
   @Override
   protected void onHandleIntent(Intent intent) {
+
     Intent finishedIntent = new Intent(BROADCAST_FINISHED_ACTION);
     Intent updateIntent = new Intent(BROADCAST_UPDATE_ACTION);
     // Broadcasts the Intent to receivers in this app.
@@ -47,6 +51,6 @@ public class DownloadRSSFeedService extends IntentService {
   @Override
   public void onDestroy() {
     super.onDestroy();
-    Log.d(LOG_TAG, "Destroyed!!!");
+    Log.d(LOG_TAG, "Destroyed");
   }
 }
