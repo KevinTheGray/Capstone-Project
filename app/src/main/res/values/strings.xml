@@ -21,14 +21,26 @@
 	<string name="add_feed_dialog_content">Enter the URL of an RSS feed you are interested in to add it to your feeds!</string>
 	<string name="add_feed_dialog_hint">URL of RSS Feed</string>
 	<string name="add_feed_dialog_negative">Cancel</string>
+	<string name="add_feed_error_dialog_title">Download Failed</string>
 
-	<!-- Exception messages -->
+	<!-- Generic strings used everywhere -->
+	<string name="OK">OK</string>
+
+	<!-- Error messages -->
 	<string name="download_rss_feed_exception_invalid_url_supplied" translatable="true">
-		Sorry, that is not a valid URL! (%d)
+		Sorry, that is not a valid URL! (%1$d - %2$s)
+	</string>
+	<string name="download_rss_feed_exception_data_retrieval_failed" translatable="true">
+		Sorry, unable to acquire feed data! (%1$d - %2$s)
 	</string>
 
 	<string name="unknown_exception_code" translatable="true">
-		Sorry, an error has occurred!  No further information is available.  Please try again. (%d)
+		Sorry, an error has occurred!  No further information is available.  Please try again. (%1$d - %2$s)
+	</string>
+
+	<!-- Exception messages -->
+	<string name="bad_http_response_code" translatable="true">
+		Bad response code (%1$d)
 	</string>
 
 	<!-- Content Descriptions -->

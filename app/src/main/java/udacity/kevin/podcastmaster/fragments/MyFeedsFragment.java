@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.exceptions.ErrorMessageFactory;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedReceiver;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedService;
 
@@ -60,8 +61,8 @@ public class MyFeedsFragment extends Fragment implements
             @Override
             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
               // Do something
-              Log.d(LOG_TAG, input.toString());
               Intent intent = new Intent(getActivity(), DownloadRSSFeedService.class);
+              intent.putExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_RSS_URL, input.toString());
               getActivity().startService(intent);
             }
           }).show();
@@ -81,5 +82,17 @@ public class MyFeedsFragment extends Fragment implements
   @Override
   public void onDownloadRSSFeedIntentReceived(Context context, Intent intent) {
     Log.d(LOG_TAG, intent.getAction());
+    boolean success = intent.getBooleanExtra(
+      DownloadRSSFeedService.INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
+    if (!success) {
+      String errorMessage = ErrorMessageFactory.GenerateErrorMessage(getActivity(),
+        intent.getIntExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_ERROR_CODE, -1),
+        intent.getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE));
+      new MaterialDialog.Builder(getActivity())
+        .title(context.getString(R.string.add_feed_error_dialog_title))
+        .content(errorMessage)
+        .positiveText(context.getString(R.string.OK))
+        .show();
+    }
   }
 }
