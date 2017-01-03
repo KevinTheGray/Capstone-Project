@@ -33,6 +33,9 @@
 	<string name="download_rss_feed_exception_data_retrieval_failed" translatable="true">
 		Sorry, unable to acquire feed data! (%1$d - %2$s)
 	</string>
+	<string name="download_rss_feed_exception_data_parsing_failed" translatable="true">
+		Sorry, unable to parse feed data! (%1$d - %2$s)
+	</string>
 
 	<string name="unknown_exception_code" translatable="true">
 		Sorry, an error has occurred!  No further information is available.  Please try again. (%1$d - %2$s)
@@ -41,6 +44,12 @@
 	<!-- Exception messages -->
 	<string name="bad_http_response_code" translatable="true">
 		Bad response code (%1$d)
+	</string>
+	<string name="bad_channel_model_exception" translatable="true">
+		Bad channel model: title was null
+	</string>
+	<string name="bad_episode_model_exception" translatable="true">
+		Bad RSSEpisode model: title was (%1$s), pubdate was (%2$s), enclosureURL was (%3$s)
 	</string>
 
 	<!-- Content Descriptions -->

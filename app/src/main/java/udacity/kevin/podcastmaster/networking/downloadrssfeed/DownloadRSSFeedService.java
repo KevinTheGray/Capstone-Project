@@ -106,9 +106,15 @@ public class DownloadRSSFeedService extends IntentService {
     Log.d(LOG_TAG, builder.toString());
     RSSFeedParser rssFeedParser = new RSSFeedParser();
     try {
-      rssFeedParser.parse(builder.toString());
+      rssFeedParser.parse(builder.toString(), this);
     } catch (Exception e) {
-      Log.d(LOG_TAG, e.getMessage());
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_ERROR_CODE,
+        DownloadRSSFeedExceptionCodes.DATA_PARSING_FAILED);
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE,
+        e.getMessage());
+      LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
+      return;
     }
 
     finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);

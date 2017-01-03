@@ -14,6 +14,9 @@ public class ErrorMessageFactory {
     } else if (code == DownloadRSSFeedExceptionCodes.DATA_RETRIEVAL_FAILED) {
       return context.getString(R.string.download_rss_feed_exception_data_retrieval_failed,
         code, details);
+    } else if (code == DownloadRSSFeedExceptionCodes.DATA_PARSING_FAILED) {
+      return context.getString(R.string.download_rss_feed_exception_data_parsing_failed,
+        code, details);
     }
 
     return context.getString(R.string.unknown_exception_code, code, details);
