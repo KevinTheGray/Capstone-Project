@@ -1,5 +1,6 @@
 package udacity.kevin.podcastmaster.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -28,6 +29,7 @@ public class MyFeedsFragment extends Fragment implements
   public static final String FRAGMENT_TAG = "MyFeedsFragment";
   private final String LOG_TAG = "MyFeedsFragment";
   private DownloadRSSFeedReceiver mDownloadRSSFeedReceiver;
+  private ProgressDialog mDownloadRSSFeedProgressDialog;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +66,8 @@ public class MyFeedsFragment extends Fragment implements
               Intent intent = new Intent(getActivity(), DownloadRSSFeedService.class);
               intent.putExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_RSS_URL, input.toString());
               getActivity().startService(intent);
+              mDownloadRSSFeedProgressDialog = ProgressDialog.show(getActivity(), "",
+                getContext().getString(R.string.add_feed_progress_dialog_downloading), true);
             }
           }).show();
       }
@@ -82,17 +86,36 @@ public class MyFeedsFragment extends Fragment implements
   @Override
   public void onDownloadRSSFeedIntentReceived(Context context, Intent intent) {
     Log.d(LOG_TAG, intent.getAction());
-    boolean success = intent.getBooleanExtra(
-      DownloadRSSFeedService.INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
-    if (!success) {
-      String errorMessage = ErrorMessageFactory.GenerateErrorMessage(getActivity(),
-        intent.getIntExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_ERROR_CODE, -1),
-        intent.getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE));
-      new MaterialDialog.Builder(getActivity())
-        .title(context.getString(R.string.add_feed_error_dialog_title))
-        .content(errorMessage)
-        .positiveText(context.getString(R.string.OK))
-        .show();
+    if (intent.getAction().equals(DownloadRSSFeedService.BROADCAST_FINISHED_ACTION)) {
+      if (mDownloadRSSFeedProgressDialog != null) {
+        mDownloadRSSFeedProgressDialog.dismiss();
+      }
+      boolean success = intent.getBooleanExtra(
+        DownloadRSSFeedService.INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
+      if (!success) {
+        String errorMessage = ErrorMessageFactory.GenerateErrorMessage(getActivity(),
+          intent.getIntExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_ERROR_CODE, -1),
+          intent.getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE));
+        new MaterialDialog.Builder(getActivity())
+          .title(context.getString(R.string.add_feed_error_dialog_title))
+          .content(errorMessage)
+          .positiveText(context.getString(R.string.OK))
+          .show();
+      } else {
+        String rssChannelTitle = intent
+          .getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_FINISHED_RSS_CHANNEL_TITLE);
+        new MaterialDialog.Builder(getActivity())
+          .title(context.getString(R.string.add_feed_success_dialog_title))
+          .content(context.getString(R.string.add_feed_success_dialog_content, rssChannelTitle))
+          .positiveText(context.getString(R.string.OK))
+          .show();
+      }
+    } else if (intent.getAction().equals(DownloadRSSFeedService.BROADCAST_UPDATE_ACTION)) {
+      if (mDownloadRSSFeedProgressDialog != null) {
+        String updateMessage =
+          intent.getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_UPDATE_MESSAGE);
+        mDownloadRSSFeedProgressDialog.setMessage(updateMessage);
+      }
     }
   }
 }

@@ -15,6 +15,7 @@ import java.net.URL;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.exceptions.DownloadRSSFeedExceptionCodes;
+import udacity.kevin.podcastmaster.models.RSSChannel;
 
 public class DownloadRSSFeedService extends IntentService {
 
@@ -33,6 +34,10 @@ public class DownloadRSSFeedService extends IntentService {
     "udacity.kevin.podcastmaster.downloadrssfeedservice.DETAILED_ERROR_MESSAGE_KEY";
   public final static String INTENT_EXTRA_KEY_FINISHED_SUCCESS =
     "udacity.kevin.podcastmaster.downloadrssfeedservice.FINISHED_SUCCESS_KEY";
+  public final static String INTENT_EXTRA_KEY_FINISHED_RSS_CHANNEL_TITLE =
+    "udacity.kevin.podcastmaster.downloadrssfeedservice.FINISHED_RSS_CHANNEL_TITLE";
+  public final static String INTENT_EXTRA_KEY_UPDATE_MESSAGE =
+    "udacity.kevin.podcastmaster.downloadrssfeedservice.UPDATE_MESSAGE";
 
   public DownloadRSSFeedService() {
     super("DownloadRSSFeedService");
@@ -105,8 +110,12 @@ public class DownloadRSSFeedService extends IntentService {
 
     Log.d(LOG_TAG, builder.toString());
     RSSFeedParser rssFeedParser = new RSSFeedParser();
+    RSSChannel rssChannel;
     try {
-      rssFeedParser.parse(builder.toString(), this);
+      updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
+        getResources().getString(R.string.add_feed_progress_dialog_xml_processing));
+      LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
+      rssChannel = rssFeedParser.parse(builder.toString(), this);
     } catch (Exception e) {
       finishedIntent.putExtra(INTENT_EXTRA_KEY_ERROR_CODE,
         DownloadRSSFeedExceptionCodes.DATA_PARSING_FAILED);
@@ -117,7 +126,17 @@ public class DownloadRSSFeedService extends IntentService {
       return;
     }
 
+    try {
+      updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
+        getResources().getString(R.string.add_feed_progress_dialog_saving_content));
+      LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
+      Thread.sleep(500);
+    } catch (Exception e){
+
+    }
+
     finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
+    finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_RSS_CHANNEL_TITLE, rssChannel.getTitle());
     LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
   }
 

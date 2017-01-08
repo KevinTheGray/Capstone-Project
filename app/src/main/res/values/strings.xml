@@ -21,7 +21,15 @@
 	<string name="add_feed_dialog_content">Enter the URL of an RSS feed you are interested in to add it to your feeds!</string>
 	<string name="add_feed_dialog_hint">URL of RSS Feed</string>
 	<string name="add_feed_dialog_negative">Cancel</string>
-	<string name="add_feed_error_dialog_title">Download Failed</string>
+	<string name="add_feed_error_dialog_title">Error</string>
+	<string name="add_feed_success_dialog_title">Success</string>
+	<string name="add_feed_success_dialog_content" translatable="true">
+		Successfully added %1$s!  Enjoy!
+	</string>
+
+	<string name="add_feed_progress_dialog_downloading">Step 1 of 3 - Requesting feed data from URL&#8230;</string>
+	<string name="add_feed_progress_dialog_xml_processing">Step 2 of 3 - Processing feed information&#8230;</string>
+	<string name="add_feed_progress_dialog_saving_content">Step 3 of 3 - Storing feed content for offline use&#8230;</string>
 
 	<!-- Generic strings used everywhere -->
 	<string name="OK">OK</string>
