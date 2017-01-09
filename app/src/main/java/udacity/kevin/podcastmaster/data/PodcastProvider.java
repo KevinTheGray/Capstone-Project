@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.CancellationSignal;
 import android.support.annotation.NonNull;
@@ -32,8 +33,25 @@ public class PodcastProvider extends ContentProvider {
 
   @Nullable
   @Override
-  public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
-    return super.query(uri, projection, selection, selectionArgs, sortOrder, cancellationSignal);
+  public Cursor query(@NonNull Uri uri, String[] projection, String selection,
+                      String[] selectionArgs, String sortOrder,
+                      CancellationSignal cancellationSignal) {
+    final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+    final int match = sUriMatcher.match(uri);
+    Cursor retCursor;
+
+    if (match == CHANNELS) {
+      retCursor = mOpenHelper.getReadableDatabase().query(
+        PodcastContract.ChannelEntry.TABLE_NAME, projection, selection, selectionArgs, null,
+        null, sortOrder);
+    } else if (match == EPISODES) {
+      retCursor = mOpenHelper.getReadableDatabase().query(
+        PodcastContract.EpisodeEntry.TABLE_NAME, projection, selection, selectionArgs, null,
+        null, sortOrder);
+    } else {
+      throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
+    return retCursor;
   }
 
   @Nullable
@@ -50,7 +68,27 @@ public class PodcastProvider extends ContentProvider {
   @Nullable
   @Override
   public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
-    return null;
+    final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+    final int match = sUriMatcher.match(uri);
+    Uri returnUri = null;
+
+    if (match == CHANNELS) {
+      long _id = db.insert(PodcastContract.ChannelEntry.TABLE_NAME, null, contentValues);
+      if ( _id > 0 )
+        returnUri = PodcastContract.ChannelEntry.buildChannelURI(_id);
+      else
+        throw new android.database.SQLException("Failed to insert row into " + uri);
+    } else if (match == EPISODES) {
+      long _id = db.insert(PodcastContract.EpisodeEntry.TABLE_NAME, null, contentValues);
+      if ( _id > 0 )
+        returnUri = PodcastContract.EpisodeEntry.buildEpisodeURI(_id);
+      else
+        throw new android.database.SQLException("Failed to insert row into " + uri);
+    } else {
+      throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
+
+    return returnUri;
   }
 
   @Override
