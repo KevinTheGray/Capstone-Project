@@ -11,18 +11,21 @@ public class RSSEpisode {
   private String description;
   private String duration;
   private String enclosureURL;
+  private String guid;
 
   public RSSEpisode(String title, String pubDate, String description, String duration,
-                    String enclosureURL, Context context) throws InvalidModelException {
-    if (title == null || pubDate == null || enclosureURL == null) {
+                    String enclosureURL, String guid, Context context) throws InvalidModelException {
+    if (title == null || pubDate == null || enclosureURL == null || guid == null) {
       throw new InvalidModelException(context.getString(R.string.bad_episode_model_exception,
-        title, pubDate, enclosureURL));
+        title, pubDate, enclosureURL, guid));
     }
     this.title = title;
     this.pubDate = pubDate;
+    this.guid = guid;
     this.description = description;
     this.duration = duration;
     this.enclosureURL = enclosureURL;
+
   }
 
   public String getTitle() {
@@ -43,5 +46,9 @@ public class RSSEpisode {
 
   public String getEnclosureURL() {
     return enclosureURL;
+  }
+
+  public String getGuid() {
+    return guid;
   }
 }

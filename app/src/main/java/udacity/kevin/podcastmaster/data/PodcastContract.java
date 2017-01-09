@@ -64,6 +64,8 @@ public class PodcastContract {
     public static final String COLUMN_DURATION = "duration";
     // Enclosure URL of the episode, stored as a String
     public static final String COLUMN_ENCLOSURE_URL = "enclosure_url";
+    // GUID of the episode, stored as a String
+    public static final String COLUMN_GUID = "guid";
     // URI of the downloaded media, stored as a String
     public static final String COLUMN_DOWNLOADED_MEDIA_URI = "download_media_uri";
     // Reference to the relayed Channel, stored as a String

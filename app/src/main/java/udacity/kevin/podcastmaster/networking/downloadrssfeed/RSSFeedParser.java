@@ -36,6 +36,7 @@ public class RSSFeedParser {
     String currentItemDescription = null;
     String currentItemEnclosureURL = null;
     String currentItemDuration = null;
+    String currentItemGUID = null;
     try {
       XmlPullParser parser = Xml.newPullParser();
       parser.setInput(inputStream, null);
@@ -64,6 +65,8 @@ public class RSSFeedParser {
                 currentItemDescription = parser.nextText();
               } else if (tagName.equals("enclosure")) {
                 currentItemEnclosureURL = parser.getAttributeValue(null, "url");
+              } else if (tagName.equals("guid")) {
+                currentItemGUID = parser.nextText();
               }
             }
           } else if (insideChannel) {
@@ -93,9 +96,10 @@ public class RSSFeedParser {
             Log.d(LOG_TAG, "item description: " + currentItemDescription);
             Log.d(LOG_TAG, "item duration: " + currentItemDuration);
             Log.d(LOG_TAG, "item enclosure: " + currentItemEnclosureURL);
+            Log.d(LOG_TAG, "item guid: " + currentItemGUID);
             try {
               RSSEpisode rssEpisode = new RSSEpisode(currentItemTitle, currentItemPubDate,
-                currentItemDescription, currentItemDuration, currentItemEnclosureURL, context);
+                currentItemDescription, currentItemDuration, currentItemEnclosureURL, currentItemGUID, context);
               returnedRSSEpisodes.add(rssEpisode);
             } catch (InvalidModelException invalidModelException) {
               Log.e(LOG_TAG, invalidModelException.getMessage());
@@ -106,6 +110,7 @@ public class RSSFeedParser {
             currentItemEnclosureURL = null;
             currentItemPubDate = null;
             currentItemTitle = null;
+            currentItemGUID = null;
             Log.d(LOG_TAG, "End item");
           }
         }
