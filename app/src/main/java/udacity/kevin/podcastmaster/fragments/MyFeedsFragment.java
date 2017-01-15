@@ -4,11 +4,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputType;
 import android.util.Log;
@@ -19,12 +23,13 @@ import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.data.PodcastContract;
 import udacity.kevin.podcastmaster.exceptions.ErrorMessageFactory;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedReceiver;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedService;
 
 public class MyFeedsFragment extends Fragment implements
-  DownloadRSSFeedReceiver.DownloadRSSFeedReceiverCallback {
+  DownloadRSSFeedReceiver.DownloadRSSFeedReceiverCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
   public static final String FRAGMENT_TAG = "MyFeedsFragment";
   private final String LOG_TAG = "MyFeedsFragment";
@@ -72,7 +77,7 @@ public class MyFeedsFragment extends Fragment implements
           }).show();
       }
     });
-
+    getLoaderManager().initLoader(0, null, this);
     return rootView;
   }
 
@@ -117,5 +122,27 @@ public class MyFeedsFragment extends Fragment implements
         mDownloadRSSFeedProgressDialog.setMessage(updateMessage);
       }
     }
+  }
+
+  @Override
+  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    return new CursorLoader(getActivity(), PodcastContract.ChannelEntry.CONTENT_URI, new String[] {
+      PodcastContract.ChannelEntry._ID,
+      PodcastContract.ChannelEntry.COLUMN_TITLE,
+      PodcastContract.ChannelEntry.COLUMN_DESCRIPTION,
+      PodcastContract.ChannelEntry.COLUMN_IMAGE_URL},
+      null,
+      null,
+      null);
+  }
+
+  @Override
+  public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    
+  }
+
+  @Override
+  public void onLoaderReset(Loader<Cursor> loader) {
+
   }
 }
