@@ -11,21 +11,28 @@ public class RSSChannel {
   private String title;
   private String description;
   private String imageURL;
+  private String rssURL;
   private ArrayList<RSSEpisode> episodes;
   public RSSChannel(String title, String description, String summary, String imageURL,
-                    ArrayList<RSSEpisode> episodes, Context context)
+                    String rssURL, ArrayList<RSSEpisode> episodes, Context context)
     throws InvalidModelException {
-    if (title == null) {
-      throw new InvalidModelException(context.getString(R.string.bad_channel_model_exception));
+    if (title == null || rssURL == null) {
+      throw new InvalidModelException(context.getString(R.string.bad_channel_model_exception,
+        title, rssURL));
     }
     this.title = title;
     this.imageURL = imageURL;
     this.episodes = episodes;
+    this.rssURL = rssURL;
     if (description != null) {
       this.description = description;
     } else if (summary != null) {
       this.description = summary;
     }
+  }
+
+  public String getRSSURL() {
+    return rssURL;
   }
 
   public String getTitle() {

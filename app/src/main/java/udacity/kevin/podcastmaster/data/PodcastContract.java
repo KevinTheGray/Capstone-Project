@@ -68,7 +68,7 @@ public class PodcastContract {
     public static final String COLUMN_GUID = "guid";
     // URI of the downloaded media, stored as a String
     public static final String COLUMN_DOWNLOADED_MEDIA_URI = "download_media_uri";
-    // Reference to the relayed Channel, stored as a String
+    // Reference to the relayed Channel, stored as a long
     public static final String COLUMN_CHANNEL_ID = "channel_id";
 
     public static Uri buildEpisodeURI(long id) {

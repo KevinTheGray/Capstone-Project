@@ -42,7 +42,7 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
       PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION + " TEXT, " +
       PodcastContract.EpisodeEntry.COLUMN_DURATION + " TEXT, " +
       PodcastContract.EpisodeEntry.COLUMN_GUID + " TEXT UNIQUE NOT NULL, " +
-      PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + " TEXT NOT NULL, " +
+      PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + " INTEGER NOT NULL, " +
       " FOREIGN KEY (" + PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + ") REFERENCES " +
       PodcastContract.ChannelEntry.TABLE_NAME + " (" + PodcastContract.ChannelEntry._ID + "));";
 

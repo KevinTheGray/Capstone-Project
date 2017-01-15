@@ -54,7 +54,7 @@
 		Bad response code (%1$d)
 	</string>
 	<string name="bad_channel_model_exception" translatable="true">
-		Bad channel model: title was null
+		Bad channel model: title was (%1$s), rssURL was (%2$s)
 	</string>
 	<string name="bad_episode_model_exception" translatable="true">
 		Bad RSSEpisode model: title was (%1$s), pubdate was (%2$s), enclosureURL was (%3$s), guid was (%4$s)

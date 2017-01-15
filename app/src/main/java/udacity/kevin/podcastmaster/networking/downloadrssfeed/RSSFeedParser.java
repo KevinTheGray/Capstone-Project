@@ -20,7 +20,7 @@ import udacity.kevin.podcastmaster.models.RSSEpisode;
 public class RSSFeedParser {
   private final String LOG_TAG = "RSSFeedParser";
 
-  public RSSChannel parse(String xmlFeed, Context context) throws
+  public RSSChannel parse(String xmlFeed, String rssURL, Context context) throws
     UnsupportedEncodingException, XmlPullParserException, IOException, InvalidModelException {
     InputStream inputStream = new ByteArrayInputStream(xmlFeed.getBytes("UTF-8"));
     RSSChannel returnedRSSChannel = null;
@@ -121,7 +121,7 @@ public class RSSFeedParser {
       Log.d(LOG_TAG, "channel description: " + channelDescription);
       Log.d(LOG_TAG, "channel image: " + channelImageURL);
       returnedRSSChannel = new RSSChannel(channelTitle, channelDescription, channelSummary,
-        channelImageURL, returnedRSSEpisodes, context);
+        channelImageURL, rssURL, returnedRSSEpisodes, context);
       return returnedRSSChannel;
     } finally {
       try {

@@ -2,6 +2,7 @@ package udacity.kevin.podcastmaster.networking.downloadrssfeed;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -14,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
 import udacity.kevin.podcastmaster.exceptions.DownloadRSSFeedExceptionCodes;
 import udacity.kevin.podcastmaster.models.RSSChannel;
 
@@ -48,7 +50,7 @@ public class DownloadRSSFeedService extends IntentService {
     Intent finishedIntent = new Intent(BROADCAST_FINISHED_ACTION);
     Intent updateIntent = new Intent(BROADCAST_UPDATE_ACTION);
 
-    String rssURLString = intent.getStringExtra(INTENT_EXTRA_KEY_RSS_URL);
+    String rssURLString = intent.getStringExtra(INTENT_EXTRA_KEY_RSS_URL).toLowerCase();
     URL rssURL;
     try {
       rssURL = new URL(rssURLString);
@@ -83,7 +85,7 @@ public class DownloadRSSFeedService extends IntentService {
       reader = new BufferedReader(new InputStreamReader(inputStream));
       String line;
       while ((line = reader.readLine()) != null) {
-        builder.append(line);;
+        builder.append(line);
       }
 
     } catch (IOException ioException) {
@@ -115,7 +117,7 @@ public class DownloadRSSFeedService extends IntentService {
       updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
         getResources().getString(R.string.add_feed_progress_dialog_xml_processing));
       LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
-      rssChannel = rssFeedParser.parse(builder.toString(), this);
+      rssChannel = rssFeedParser.parse(builder.toString(), rssURLString, this);
     } catch (Exception e) {
       finishedIntent.putExtra(INTENT_EXTRA_KEY_ERROR_CODE,
         DownloadRSSFeedExceptionCodes.DATA_PARSING_FAILED);
@@ -126,12 +128,15 @@ public class DownloadRSSFeedService extends IntentService {
       return;
     }
 
-    try {
-      updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
-        getResources().getString(R.string.add_feed_progress_dialog_saving_content));
-      LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
-      Thread.sleep(500);
-    } catch (Exception e){
+    PodcastCRUDHelper podcastCRUDHelper = new PodcastCRUDHelper(getContentResolver());
+    updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
+      getResources().getString(R.string.add_feed_progress_dialog_saving_content));
+    LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
+
+    Uri channelUri = podcastCRUDHelper.insertOrUpdateRSSChannel(rssChannel);
+    if (channelUri != null) {
+
+    } else {
 
     }
 

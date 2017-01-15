@@ -62,7 +62,17 @@ public class PodcastProvider extends ContentProvider {
 
   @Override
   public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
-    return 0;
+    final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+    final int match = sUriMatcher.match(uri);
+    int updateCount = 0;
+    if (match == CHANNELS) {
+      updateCount = db.update(PodcastContract.ChannelEntry.TABLE_NAME, contentValues, s, strings);
+    } else if (match == EPISODES) {
+      updateCount = db.update(PodcastContract.EpisodeEntry.TABLE_NAME, contentValues, s, strings);
+    } else {
+      throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
+    return updateCount;
   }
 
   @Nullable
