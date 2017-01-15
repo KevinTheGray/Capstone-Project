@@ -102,11 +102,11 @@ public class MyFeedsFragment extends Fragment implements
           .positiveText(context.getString(R.string.OK))
           .show();
       } else {
-        String rssChannelTitle = intent
-          .getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_FINISHED_RSS_CHANNEL_TITLE);
+        String successMessage = intent
+          .getStringExtra(DownloadRSSFeedService.INTENT_EXTRA_KEY_SUCCESS_MESSAGE);
         new MaterialDialog.Builder(getActivity())
           .title(context.getString(R.string.add_feed_success_dialog_title))
-          .content(context.getString(R.string.add_feed_success_dialog_content, rssChannelTitle))
+          .content(successMessage)
           .positiveText(context.getString(R.string.OK))
           .show();
       }

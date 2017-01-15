@@ -23,9 +23,13 @@
 	<string name="add_feed_dialog_negative">Cancel</string>
 	<string name="add_feed_error_dialog_title">Error</string>
 	<string name="add_feed_success_dialog_title">Success</string>
-	<string name="add_feed_success_dialog_content" translatable="true">
+	<string name="add_feed_success_inserted_dialog_content" translatable="true">
 		Successfully added %1$s!  Enjoy!
 	</string>
+	<string name="add_feed_success_updated_dialog_content" translatable="true">
+		%1$s has already been added, and it has been updated with the most recent data! Enjoy!
+	</string>
+
 
 	<string name="add_feed_progress_dialog_downloading">Step 1 of 3 - Requesting feed data from URL&#8230;</string>
 	<string name="add_feed_progress_dialog_xml_processing">Step 2 of 3 - Processing feed information&#8230;</string>
@@ -43,6 +47,9 @@
 	</string>
 	<string name="download_rss_feed_exception_data_parsing_failed" translatable="true">
 		Sorry, unable to parse feed data! (%1$d - %2$s)
+	</string>
+	<string name="download_rss_feed_exception_data_insertion_failed" translatable="true">
+		Sorry, unable to add the acquired data! (%1$d)
 	</string>
 
 	<string name="unknown_exception_code" translatable="true">

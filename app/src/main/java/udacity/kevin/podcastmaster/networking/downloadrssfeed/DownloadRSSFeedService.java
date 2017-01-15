@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
@@ -36,10 +37,10 @@ public class DownloadRSSFeedService extends IntentService {
     "udacity.kevin.podcastmaster.downloadrssfeedservice.DETAILED_ERROR_MESSAGE_KEY";
   public final static String INTENT_EXTRA_KEY_FINISHED_SUCCESS =
     "udacity.kevin.podcastmaster.downloadrssfeedservice.FINISHED_SUCCESS_KEY";
-  public final static String INTENT_EXTRA_KEY_FINISHED_RSS_CHANNEL_TITLE =
-    "udacity.kevin.podcastmaster.downloadrssfeedservice.FINISHED_RSS_CHANNEL_TITLE";
   public final static String INTENT_EXTRA_KEY_UPDATE_MESSAGE =
     "udacity.kevin.podcastmaster.downloadrssfeedservice.UPDATE_MESSAGE";
+  public final static String INTENT_EXTRA_KEY_SUCCESS_MESSAGE =
+    "udacity.kevin.podcastmaster.downloadrssfeedservice.SUCCESS_MESSAGE";
 
   public DownloadRSSFeedService() {
     super("DownloadRSSFeedService");
@@ -133,15 +134,27 @@ public class DownloadRSSFeedService extends IntentService {
       getResources().getString(R.string.add_feed_progress_dialog_saving_content));
     LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
 
-    Uri channelUri = podcastCRUDHelper.insertOrUpdateRSSChannel(rssChannel);
-    if (channelUri != null) {
-
-    } else {
-
+    HashMap<String, Object> iouReturnValues =
+      podcastCRUDHelper.insertOrUpdateRSSChannel(rssChannel);
+    Uri channelUri = (Uri) iouReturnValues.get(PodcastCRUDHelper.URI_RETURN_KEY);
+    boolean wasInserted = (boolean) iouReturnValues.get(PodcastCRUDHelper.URI_WAS_INSERTED_KEY);
+    if (channelUri == null) {
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_ERROR_CODE,
+        DownloadRSSFeedExceptionCodes.DATA_INSERTION_FAILED);
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE, "");
+      LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
+      return;
     }
 
     finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
-    finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_RSS_CHANNEL_TITLE, rssChannel.getTitle());
+    if (wasInserted) {
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_SUCCESS_MESSAGE,
+        getString(R.string.add_feed_success_inserted_dialog_content, rssChannel.getTitle()));
+    } else {
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_SUCCESS_MESSAGE,
+        getString(R.string.add_feed_success_updated_dialog_content, rssChannel.getTitle()));
+    }
     LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
   }
 
