@@ -29,6 +29,9 @@
 	<string name="add_feed_success_updated_dialog_content" translatable="true">
 		%1$s has already been added, and it has been updated with the most recent data! Enjoy!
 	</string>
+	<string name="my_feeds_empty_string" translatable="true">
+		You don\'t have any feeds!\nClick the \'+\' button to add some!
+	</string>
 
 
 	<string name="add_feed_progress_dialog_downloading">Step 1 of 3 - Requesting feed data from URL&#8230;</string>

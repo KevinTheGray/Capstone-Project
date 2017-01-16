@@ -7,6 +7,10 @@
 	<dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
 
+	<!-- My Feeds -->
+	<dimen name="empty_view_top_margin">80dp</dimen>
+	<dimen name="empty_view_text_size">24sp</dimen>
+
 	<!-- Widgets -->
 	<dimen name="widget_title_margin_start">4dp</dimen>
 	<dimen name="widget_podcast_title_text">18sp</dimen>
