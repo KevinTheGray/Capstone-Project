@@ -12,13 +12,27 @@
 			android:title="@string/menu_drawer_my_downloads"/>
 	</group>
 
-<!--	<item android:title="Debug">
+<item android:title="Debug">
 		<menu>
 			<item
-				android:id="@+id/nav_send"
-				android:icon="@drawable/ic_menu_send"
-				android:title="Send"/>
+				android:id="@+id/nav_debug_copy_lore"
+				android:title="Copy Lore"/>
+			<item
+				android:id="@+id/nav_debug_copy_tal"
+				android:title="Copy This American Life"/>
+			<item
+				android:id="@+id/nav_debug_copy_iiwy"
+				android:title="Copy If I Were You"/>
+			<item
+				android:id="@+id/nav_debug_copy_serial"
+				android:title="Copy Serial"/>
+			<item
+				android:id="@+id/nav_debug_copy_fresh_air"
+				android:title="Copy Fresh Air"/>
+			<item
+				android:id="@+id/nav_debug_copy_99pi"
+				android:title="Copy 99% Invisible"/>
 		</menu>
-	</item> -->
+	</item>
 
 </menu>

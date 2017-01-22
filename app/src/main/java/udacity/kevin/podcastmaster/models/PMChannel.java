@@ -1,7 +1,6 @@
 package udacity.kevin.podcastmaster.models;
 
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 
 import udacity.kevin.podcastmaster.data.PodcastContract;
 
@@ -12,7 +11,6 @@ public class PMChannel {
   private String imageURL;
 
   public PMChannel(Cursor cursor) {
-    DatabaseUtils.dumpCursor(cursor);
     this.id = cursor.getLong(
       cursor.getColumnIndex(PodcastContract.ChannelEntry._ID));
     this.title = cursor.getString(

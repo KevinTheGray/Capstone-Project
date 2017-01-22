@@ -74,4 +74,5 @@
 	<string name="content_description_play_control_button" translatable="true">Play Control Button</string>
 	<string name="content_description_previous_control_button" translatable="true">Seek 10 Previous Control Button</string>
 	<string name="content_description_next_control_button" translatable="true">Seek 10 Next Control Button</string>
+	<string name="content_description_channel_image" translatable="true">Podcast Artwork Image</string>
 </resources>

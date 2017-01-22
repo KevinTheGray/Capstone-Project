@@ -14,6 +14,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.adapters.ChannelCursorAdapter;
 import udacity.kevin.podcastmaster.data.PodcastContract;
 import udacity.kevin.podcastmaster.exceptions.ErrorMessageFactory;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedReceiver;
@@ -35,6 +38,9 @@ public class MyFeedsFragment extends Fragment implements
   private final String LOG_TAG = "MyFeedsFragment";
   private DownloadRSSFeedReceiver mDownloadRSSFeedReceiver;
   private ProgressDialog mDownloadRSSFeedProgressDialog;
+  private ChannelCursorAdapter mChannelCursorAdapter;
+  private View mEmptyView;
+  private Cursor mCurrentChannelCursor;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +54,9 @@ public class MyFeedsFragment extends Fragment implements
     LocalBroadcastManager.getInstance(getContext()).registerReceiver(
       mDownloadRSSFeedReceiver, downloadRSSFeedIntentFilter);
       mDownloadRSSFeedReceiver.setCallback(this);
+
+    mChannelCursorAdapter = new ChannelCursorAdapter(getActivity(), null);
+    getLoaderManager().initLoader(0, null, this);
   }
 
   @Nullable
@@ -56,6 +65,8 @@ public class MyFeedsFragment extends Fragment implements
     View rootView = inflater.inflate(R.layout.fragment_my_feeds, container, false);
 
     FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+    RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.channels_recycler_view);
+
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -77,7 +88,12 @@ public class MyFeedsFragment extends Fragment implements
           }).show();
       }
     });
-    getLoaderManager().initLoader(0, null, this);
+
+    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    recyclerView.setAdapter(mChannelCursorAdapter);
+
+    mEmptyView = rootView.findViewById(R.id.empty_view);
+
     return rootView;
   }
 
@@ -114,6 +130,7 @@ public class MyFeedsFragment extends Fragment implements
           .content(successMessage)
           .positiveText(context.getString(R.string.OK))
           .show();
+        getLoaderManager().restartLoader(0, null, this);
       }
     } else if (intent.getAction().equals(DownloadRSSFeedService.BROADCAST_UPDATE_ACTION)) {
       if (mDownloadRSSFeedProgressDialog != null) {
@@ -138,11 +155,21 @@ public class MyFeedsFragment extends Fragment implements
 
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-    
+    mChannelCursorAdapter.swapCursor(data);
+    mCurrentChannelCursor = data;
+    updateEmptyView();
   }
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader) {
 
+  }
+
+  private void updateEmptyView() {
+    if (mCurrentChannelCursor == null || mCurrentChannelCursor.getCount() == 0) {
+      mEmptyView.setVisibility(View.VISIBLE);
+    } else {
+      mEmptyView.setVisibility(View.GONE);
+    }
   }
 }

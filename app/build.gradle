@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
 	compileSdkVersion 25
-	buildToolsVersion "25.0.1"
+	buildToolsVersion "25.0.2"
 	defaultConfig {
 		applicationId "udacity.kevin.podcastmaster"
 		minSdkVersion 21
@@ -30,6 +30,7 @@ dependencies {
 	compile 'com.google.android.gms:play-services-analytics:10.0.1'
 	compile 'com.google.android.gms:play-services-ads:10.0.1'
 	compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+	compile 'com.github.bumptech.glide:glide:3.7.0'
 	testCompile 'junit:junit:4.12'
 }
 

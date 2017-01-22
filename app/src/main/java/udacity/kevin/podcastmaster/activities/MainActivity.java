@@ -1,5 +1,8 @@
 package udacity.kevin.podcastmaster.activities;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -126,6 +129,27 @@ public class MainActivity extends AppCompatActivity
 
     if (id == R.id.nav_my_feeds) {
     } else if (id == R.id.my_downloads) {
+    }
+
+    // Debug stuff only
+    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+    ClipData clip = null;
+    if (id == R.id.nav_debug_copy_lore) {
+      clip = ClipData.newPlainText("lore rss url", "http://lorepodcast.libsyn.com/rss");
+    } else if (id == R.id.nav_debug_copy_tal) {
+      clip = ClipData.newPlainText("tal rss url", "http://feed.thisamericanlife.org/talpodcast.xml");
+    } else if (id == R.id.nav_debug_copy_iiwy) {
+      clip = ClipData.newPlainText("iiwy rss url", "http://feeds.feedburner.com/soundcloud/mudw.xml");
+    } else if (id == R.id.nav_debug_copy_serial) {
+      clip = ClipData.newPlainText("serial rss url", "http://feeds.serialpodcast.org/serialpodcast.xml");
+    } else if (id == R.id.nav_debug_copy_fresh_air) {
+      clip = ClipData.newPlainText("fresh air rss url", "https://www.npr.org/rss/podcast.php?id=381444908");
+    } else if (id == R.id.nav_debug_copy_99pi) {
+      clip = ClipData.newPlainText("99pi rss url", "http://feeds.99percentinvisible.org/99percentinvisible.xml");
+    }
+
+    if (clip != null) {
+      clipboard.setPrimaryClip(clip);
     }
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
