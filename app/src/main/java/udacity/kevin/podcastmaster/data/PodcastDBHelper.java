@@ -44,7 +44,8 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
       PodcastContract.EpisodeEntry.COLUMN_GUID + " TEXT UNIQUE NOT NULL, " +
       PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + " INTEGER NOT NULL, " +
       " FOREIGN KEY (" + PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + ") REFERENCES " +
-      PodcastContract.ChannelEntry.TABLE_NAME + " (" + PodcastContract.ChannelEntry._ID + "));";
+      PodcastContract.ChannelEntry.TABLE_NAME + " (" + PodcastContract.ChannelEntry._ID + ")" +
+      " ON DELETE CASCADE );";
 
     sqLiteDatabase.execSQL(SQL_CREATE_CHANNEL_TABLE);
     sqLiteDatabase.execSQL(SQL_CREATE_EPISODE_TABLE);

@@ -103,7 +103,17 @@ public class PodcastProvider extends ContentProvider {
 
   @Override
   public int delete(@NonNull Uri uri, String s, String[] strings) {
-    return 0;
+    final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+    final int match = sUriMatcher.match(uri);
+    int deletedCount = 0;
+    if (match == CHANNELS) {
+      deletedCount = db.delete(PodcastContract.ChannelEntry.TABLE_NAME, s, strings);
+    } else if (match == EPISODES) {
+      deletedCount = db.delete(PodcastContract.EpisodeEntry.TABLE_NAME, s, strings);
+    } else {
+      throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
+    return deletedCount;
   }
 
   static UriMatcher buildUriMatcher() {

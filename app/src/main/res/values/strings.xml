@@ -38,8 +38,14 @@
 	<string name="add_feed_progress_dialog_xml_processing">Step 2 of 3 - Processing feed information&#8230;</string>
 	<string name="add_feed_progress_dialog_saving_content">Step 3 of 3 - Storing feed content for offline use&#8230;</string>
 
+	<string name="remove_feed_dialog_title" translatable="true">Are you sure you want to remove %1$s?</string>
+	<string name="remove_feed_dialog_content" translatable="true">%1$s, all of its episodes, and any downloaded content will be deleted.</string>
+	<string name="remove_feed_dialog_negative_text" translatable="true">@string/cancel</string>
+	<string name="remove_feed_dialog_positive_text" translatable="true">Remove %1$s</string>
+
 	<!-- Generic strings used everywhere -->
 	<string name="OK">OK</string>
+	<string name="cancel">Cancel</string>
 
 	<!-- Error messages -->
 	<string name="download_rss_feed_exception_invalid_url_supplied" translatable="true">

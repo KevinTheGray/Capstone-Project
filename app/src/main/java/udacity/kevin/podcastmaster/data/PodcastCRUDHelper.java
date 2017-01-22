@@ -128,4 +128,10 @@ public class PodcastCRUDHelper {
     returnedHashMap.put(URI_WAS_INSERTED_KEY, wasInserted);
     return returnedHashMap;
   }
+
+  public void deletePMChannel(PMChannel pmChannel) {
+    contentResolver.delete(PodcastContract.ChannelEntry.CONTENT_URI,
+      PodcastContract.ChannelEntry._ID + " = ?",
+      new String[] {String.valueOf(pmChannel.getID())});
+  }
 }

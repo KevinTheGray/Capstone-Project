@@ -16,18 +16,22 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.adapters.ChannelCursorAdapter;
+import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
 import udacity.kevin.podcastmaster.data.PodcastContract;
 import udacity.kevin.podcastmaster.exceptions.ErrorMessageFactory;
+import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedReceiver;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedService;
 
@@ -91,6 +95,18 @@ public class MyFeedsFragment extends Fragment implements
 
     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     recyclerView.setAdapter(mChannelCursorAdapter);
+    ItemTouchHelper.SimpleCallback itemTouchHelperSimpleCallback =
+      new ItemTouchHelper.SimpleCallback(ItemTouchHelper.START, ItemTouchHelper.START) {
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+          channelSwipedToDismiss(viewHolder.getAdapterPosition());
+        }
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                              RecyclerView.ViewHolder target) { return false; }
+      };
+    ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchHelperSimpleCallback);
+    itemTouchHelper.attachToRecyclerView(recyclerView);
 
     mEmptyView = rootView.findViewById(R.id.empty_view);
 
@@ -162,7 +178,6 @@ public class MyFeedsFragment extends Fragment implements
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader) {
-
   }
 
   private void updateEmptyView() {
@@ -171,5 +186,34 @@ public class MyFeedsFragment extends Fragment implements
     } else {
       mEmptyView.setVisibility(View.GONE);
     }
+  }
+
+  private void channelSwipedToDismiss(int cursorPosition) {
+    mCurrentChannelCursor.moveToPosition(cursorPosition);
+    final PMChannel pmChannel = new PMChannel(mCurrentChannelCursor);
+    final LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks = this;
+    // Show modal requesting the deletion
+    // if accepted, initiate delete and restart the cursor.
+    new MaterialDialog.Builder(getActivity())
+      .title(getString(R.string.remove_feed_dialog_title, pmChannel.getTitle()))
+      .content(getString(R.string.remove_feed_dialog_content, pmChannel.getTitle()))
+      .positiveText(getString(R.string.remove_feed_dialog_positive_text, pmChannel.getTitle()))
+      .onPositive(new MaterialDialog.SingleButtonCallback() {
+        @Override
+        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+          PodcastCRUDHelper crudHelper = new PodcastCRUDHelper(getActivity().getContentResolver());
+          crudHelper.deletePMChannel(pmChannel);
+          getLoaderManager().restartLoader(0, null, loaderCallbacks);
+        }
+      })
+      .negativeText(getString(R.string.remove_feed_dialog_negative_text))
+      .onNegative(new MaterialDialog.SingleButtonCallback() {
+        @Override
+        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+          getLoaderManager().restartLoader(0, null, loaderCallbacks);
+        }
+      })
+      .cancelable(false)
+      .show();
   }
 }
