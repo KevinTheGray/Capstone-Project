@@ -81,6 +81,7 @@ public class PodcastCRUDHelper {
       wasInserted = true;
       returnedChannelUri =
         contentResolver.insert(PodcastContract.ChannelEntry.CONTENT_URI, channelValues);
+      pmChannel = findChannelByURLOrNull(rssChannel.getRSSURL());
     } else {
       Uri channelURI = PodcastContract.ChannelEntry.buildChannelURI(pmChannel.getID());
       int updateCount = contentResolver.update(PodcastContract.ChannelEntry.CONTENT_URI,
@@ -110,7 +111,7 @@ public class PodcastCRUDHelper {
           if (episodeURI == null) {
             Log.e(LOG_TAG, "Failed to insert an episode from " + rssChannel.getTitle()
               + "with GUID " + rssEpisode.getGuid());
-          }
+          } 
         } else {
           episodeValues.put(PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI,
             pmEpisode.getDownloadedMediaURI());

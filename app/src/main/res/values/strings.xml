@@ -33,6 +33,10 @@
 		You don\'t have any feeds!\nClick the \'+\' button to add some!
 	</string>
 
+	<!-- Episode List -->
+	<string name="episode_list_empty_string" translatable="true">
+		Looks like this feed doesn\'t have any episodes!
+	</string>
 
 	<string name="add_feed_progress_dialog_downloading">Step 1 of 3 - Requesting feed data from URL&#8230;</string>
 	<string name="add_feed_progress_dialog_xml_processing">Step 2 of 3 - Processing feed information&#8230;</string>

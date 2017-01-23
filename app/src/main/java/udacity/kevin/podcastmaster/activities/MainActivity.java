@@ -25,6 +25,7 @@ import com.google.android.gms.analytics.Tracker;
 
 import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.fragments.EpisodeListFragment;
 import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
 import udacity.kevin.podcastmaster.models.PMChannel;
 
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity
   private final String LOG_TAG = "MainActivity";
   private final String SCREEN_NAME = "MainActivity";
   private MyFeedsFragment mMyFeedsFragment;
+  private EpisodeListFragment mEpisodeListFragment;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity
       MyFeedsFragment myFeedsFragment = new MyFeedsFragment();
       fragmentTransaction
         .add(R.id.fragment_container, myFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
+      fragmentTransaction.addToBackStack(null);
       fragmentTransaction.commit();
     }
 
@@ -86,11 +89,15 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void onBackPressed() {
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-    if (drawer.isDrawerOpen(GravityCompat.START)) {
+    if (getFragmentManager().getBackStackEntryCount() > 0) {
+      getFragmentManager().popBackStack();
+    }
+    else if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
     } else {
       super.onBackPressed();
     }
+
   }
 
   @Override
@@ -169,5 +176,18 @@ public class MainActivity extends AppCompatActivity
 
   public void channelSelected(PMChannel pmChannel) {
     Log.d(LOG_TAG, pmChannel.getTitle() + " selected");
+    // Todo: Handle tablet layout
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    mEpisodeListFragment = (EpisodeListFragment) fragmentManager
+      .findFragmentByTag(EpisodeListFragment.FRAGMENT_TAG);
+    if (mEpisodeListFragment == null) {
+      mEpisodeListFragment = new EpisodeListFragment();
+    }
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    fragmentTransaction.replace(R.id.fragment_container,
+      mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
+    fragmentTransaction.addToBackStack(null);
+    fragmentTransaction.commit();
   }
+
 }

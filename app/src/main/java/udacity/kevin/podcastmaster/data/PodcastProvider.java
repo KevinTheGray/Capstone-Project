@@ -126,4 +126,5 @@ public class PodcastProvider extends ContentProvider {
 
     return matcher;
   }
+
 }
