@@ -14,16 +14,20 @@ import android.view.ViewGroup;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.data.PodcastContract;
+import udacity.kevin.podcastmaster.models.PMChannel;
 
 public class EpisodeListFragment extends Fragment
   implements LoaderManager.LoaderCallbacks<Cursor> {
   public static final String FRAGMENT_TAG = "EpisodeListFragment";
+  public static final String LOG_TAG = "EpisodeListFragment";
+  public static final String BUNDLE_KEY_CHANNEL_PARCELABLE = "BUNDLE_KEY_PM_CHANNEL";
+  public PMChannel mPMChannel;
   private View mEmptyView;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+    mPMChannel = getArguments().getParcelable(BUNDLE_KEY_CHANNEL_PARCELABLE);
     getLoaderManager().initLoader(0, null, this);
   }
 
@@ -45,14 +49,14 @@ public class EpisodeListFragment extends Fragment
       PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI,
       PodcastContract.EpisodeEntry.COLUMN_DURATION,
       PodcastContract.EpisodeEntry.COLUMN_PUB_DATE,},
-      null,
-      null,
+      PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + " = ?",
+      new String[] {String.valueOf(mPMChannel.getID())},
       null);
   }
 
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-    Log.d("BOOP", "" + data.getCount());
+    Log.d(LOG_TAG, "Cursor count: " + data.getCount());
   }
 
   @Override

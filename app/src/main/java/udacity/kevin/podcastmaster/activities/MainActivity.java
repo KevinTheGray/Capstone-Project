@@ -183,6 +183,9 @@ public class MainActivity extends AppCompatActivity
     if (mEpisodeListFragment == null) {
       mEpisodeListFragment = new EpisodeListFragment();
     }
+    Bundle fragmentBundle = new Bundle();
+    fragmentBundle.putParcelable(EpisodeListFragment.BUNDLE_KEY_CHANNEL_PARCELABLE, pmChannel);
+    mEpisodeListFragment.setArguments(fragmentBundle);
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     fragmentTransaction.replace(R.id.fragment_container,
       mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);

@@ -1,10 +1,12 @@
 package udacity.kevin.podcastmaster.models;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import udacity.kevin.podcastmaster.data.PodcastContract;
 
-public class PMEpisode {
+public class PMEpisode implements Parcelable {
   private long id;
   private long channelID;
   private String title;
@@ -71,5 +73,44 @@ public class PMEpisode {
 
   public long getChannelID() {
     return channelID;
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel parcel, int i) {
+    parcel.writeLong(this.id);
+    parcel.writeLong(this.channelID);
+    parcel.writeString(this.title);
+    parcel.writeString(this.description);
+    parcel.writeString(this.pubDate);
+    parcel.writeString(this.duration);
+    parcel.writeString(this.enclosureURL);
+    parcel.writeString(this.guid);
+    parcel.writeString(this.downloadedMediaURI);
+  }
+
+  public static final Parcelable.Creator<PMEpisode> CREATOR = new Parcelable.Creator<PMEpisode>() {
+    public PMEpisode createFromParcel(Parcel in) {
+      return new PMEpisode(in);
+    }
+    public PMEpisode[] newArray(int size) {
+      return new PMEpisode[size];
+    }
+  };
+
+  private PMEpisode(Parcel in) {
+    this.id = in.readLong();
+    this.channelID = in.readLong();
+    this.title = in.readString();
+    this.description = in.readString();
+    this.pubDate = in.readString();
+    this.duration = in.readString();
+    this.enclosureURL = in.readString();
+    this.guid = in.readString();
+    this.downloadedMediaURI = in.readString();
   }
 }

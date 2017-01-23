@@ -111,7 +111,7 @@ public class PodcastCRUDHelper {
           if (episodeURI == null) {
             Log.e(LOG_TAG, "Failed to insert an episode from " + rssChannel.getTitle()
               + "with GUID " + rssEpisode.getGuid());
-          } 
+          }
         } else {
           episodeValues.put(PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI,
             pmEpisode.getDownloadedMediaURI());
