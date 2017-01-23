@@ -27,10 +27,12 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.adapters.ChannelCursorAdapter;
 import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
 import udacity.kevin.podcastmaster.data.PodcastContract;
 import udacity.kevin.podcastmaster.exceptions.ErrorMessageFactory;
+import udacity.kevin.podcastmaster.listeners.RecyclerViewItemClickListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedReceiver;
 import udacity.kevin.podcastmaster.networking.downloadrssfeed.DownloadRSSFeedService;
@@ -107,6 +109,17 @@ public class MyFeedsFragment extends Fragment implements
       };
     ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchHelperSimpleCallback);
     itemTouchHelper.attachToRecyclerView(recyclerView);
+
+    recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(),
+      new RecyclerViewItemClickListener.OnItemClickListener() {
+        @Override
+        public void onItemClick(View v, int position) {
+          mCurrentChannelCursor.moveToPosition(position);
+          PMChannel pmChannel = new PMChannel(mCurrentChannelCursor);
+          MainActivity mainActivity = (MainActivity) getActivity();
+          mainActivity.channelSelected(pmChannel);
+        }
+      }));
 
     mEmptyView = rootView.findViewById(R.id.empty_view);
 
