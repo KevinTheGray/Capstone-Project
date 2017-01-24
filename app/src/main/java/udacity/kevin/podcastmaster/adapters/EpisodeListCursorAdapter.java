@@ -17,6 +17,9 @@ import udacity.kevin.podcastmaster.models.PMChannel;
 public class EpisodeListCursorAdapter
   extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder> {
 
+  private final int VIEW_TYPE_CHANNEL_DETAIL = 0;
+  private final int VIEW_TYPE_EPISODE = 1;
+
   private Context mContext;
   private PMChannel mPMChannel;
 
@@ -27,21 +30,57 @@ public class EpisodeListCursorAdapter
   }
 
   @Override
+  public int getItemCount() {
+    // Plus one for the header
+    return (super.getItemCount() + 1);
+  }
+
+  @Override
+  public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+    if (position == 0) {
+      onBindViewHolder(viewHolder, null);
+    } else if (getCursor().moveToPosition(position - 1)) {
+      onBindViewHolder(viewHolder, getCursor());
+    } else {
+      throw new IllegalStateException("couldn't move cursor to position " + position);
+    }
+  }
+
+  @Override
   public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    View cellView = LayoutInflater.from(parent.getContext())
-      .inflate(R.layout.cell_channel_detail, parent, false);
-    return new EpisodeListCursorAdapter.ChannelDetailViewHolder(cellView);
+    if (viewType == VIEW_TYPE_CHANNEL_DETAIL) {
+      View cellView = LayoutInflater.from(parent.getContext())
+        .inflate(R.layout.cell_channel_detail, parent, false);
+      return new EpisodeListCursorAdapter.ChannelDetailViewHolder(cellView);
+    } else {
+      View cellView = LayoutInflater.from(parent.getContext())
+        .inflate(R.layout.cell_episode, parent, false);
+      return new EpisodeListCursorAdapter.ChannelDetailViewHolder(cellView);
+    }
   }
 
   @Override
   public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
-    ChannelDetailViewHolder channelDetailViewHolder = (ChannelDetailViewHolder) viewHolder;
-    Glide.with(mContext).load(mPMChannel.getImageURL()).into(channelDetailViewHolder.channelImage);
-    channelDetailViewHolder.channelTitle.setText(mPMChannel.getTitle());
-    if (mPMChannel.getDescription() != null) {
-      channelDetailViewHolder.channelDescription.setText(mPMChannel.getDescription());
+    if (cursor == null) {
+      ChannelDetailViewHolder channelDetailViewHolder = (ChannelDetailViewHolder) viewHolder;
+      Glide.with(mContext).load(mPMChannel.getImageURL()).into(channelDetailViewHolder.channelImage);
+      channelDetailViewHolder.channelTitle.setText(mPMChannel.getTitle());
+      if (mPMChannel.getDescription() != null) {
+        channelDetailViewHolder.channelDescription.setText(mPMChannel.getDescription());
+      } else {
+        channelDetailViewHolder.channelDescription.setVisibility(View.GONE);
+      }
     } else {
-      channelDetailViewHolder.channelDescription.setVisibility(View.GONE);
+
+    }
+  }
+
+  @Override
+  public int getItemViewType(int position) {
+    if (position == 0) {
+      return VIEW_TYPE_CHANNEL_DETAIL;
+    } else {
+      return VIEW_TYPE_EPISODE;
     }
   }
 
