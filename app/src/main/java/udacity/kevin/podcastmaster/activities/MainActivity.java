@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity
       MyFeedsFragment myFeedsFragment = new MyFeedsFragment();
       fragmentTransaction
         .add(R.id.fragment_container, myFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
-      fragmentTransaction.addToBackStack(null);
       fragmentTransaction.commit();
     }
 

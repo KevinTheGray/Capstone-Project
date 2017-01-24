@@ -6,6 +6,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:background="@color/colorPrimaryDark"
 	app:layout_behavior="@string/appbar_scrolling_view_behavior"
 	tools:showIn="@layout/app_bar_main">
 
@@ -15,7 +16,7 @@
 		android:layout_height="wrap_content"
 		android:textSize="@dimen/empty_view_text_size"
 		android:paddingTop="@dimen/empty_view_top_margin"
-		android:textColor="#000000"
+		android:textColor="#FFFFFF"
 		android:gravity="center"
 		android:layout_alignParentTop="true"
 		android:layout_centerHorizontal="true"

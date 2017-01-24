@@ -7,12 +7,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.adapters.EpisodeListCursorAdapter;
 import udacity.kevin.podcastmaster.data.PodcastContract;
 import udacity.kevin.podcastmaster.models.PMChannel;
 
@@ -22,12 +24,14 @@ public class EpisodeListFragment extends Fragment
   public static final String LOG_TAG = "EpisodeListFragment";
   public static final String BUNDLE_KEY_CHANNEL_PARCELABLE = "BUNDLE_KEY_PM_CHANNEL";
   public PMChannel mPMChannel;
-  private View mEmptyView;
+  private EpisodeListCursorAdapter mEpisodeListCursorAdapter;
+  private Cursor mCurrentEpisodeListCursor;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mPMChannel = getArguments().getParcelable(BUNDLE_KEY_CHANNEL_PARCELABLE);
+    mEpisodeListCursorAdapter = new EpisodeListCursorAdapter(getActivity(), null, mPMChannel);
     getLoaderManager().initLoader(0, null, this);
   }
 
@@ -36,7 +40,9 @@ public class EpisodeListFragment extends Fragment
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_episodes_list, container, false);
 
-    mEmptyView = rootView.findViewById(R.id.empty_view);
+    RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.episodes_recycler_view);
+    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    recyclerView.setAdapter(mEpisodeListCursorAdapter);
 
     return rootView;
   }
@@ -56,7 +62,8 @@ public class EpisodeListFragment extends Fragment
 
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-    Log.d(LOG_TAG, "Cursor count: " + data.getCount());
+    mEpisodeListCursorAdapter.swapCursor(data);
+    mCurrentEpisodeListCursor = data;
   }
 
   @Override

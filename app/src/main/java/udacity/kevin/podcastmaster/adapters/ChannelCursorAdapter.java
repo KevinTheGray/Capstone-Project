@@ -36,7 +36,6 @@ public class ChannelCursorAdapter
     PMChannel pmChannel = new PMChannel(cursor);
     viewHolder.channelTitle.setText(pmChannel.getTitle());
     if (pmChannel.getImageURL() != null) {
-      // Picasso.with(mContext).load(pmChannel.getImageURL()).into(viewHolder.channelImage);
       Glide.with(mContext).load(pmChannel.getImageURL()).into(viewHolder.channelImage);
     }
   }
