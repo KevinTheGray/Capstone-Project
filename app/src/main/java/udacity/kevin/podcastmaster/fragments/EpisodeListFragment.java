@@ -51,9 +51,13 @@ public class EpisodeListFragment extends Fragment
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
     return new CursorLoader(getActivity(), PodcastContract.EpisodeEntry.CONTENT_URI, new String[] {
       PodcastContract.EpisodeEntry._ID,
+      PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID,
+      PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
       PodcastContract.EpisodeEntry.COLUMN_TITLE,
       PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI,
       PodcastContract.EpisodeEntry.COLUMN_DURATION,
+      PodcastContract.EpisodeEntry.COLUMN_ENCLOSURE_URL,
+      PodcastContract.EpisodeEntry.COLUMN_GUID,
       PodcastContract.EpisodeEntry.COLUMN_PUB_DATE,},
       PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + " = ?",
       new String[] {String.valueOf(mPMChannel.getID())},

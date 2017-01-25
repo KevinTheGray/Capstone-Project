@@ -3,6 +3,7 @@ package udacity.kevin.podcastmaster.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.models.PMChannel;
+import udacity.kevin.podcastmaster.models.PMEpisode;
 
 public class EpisodeListCursorAdapter
   extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder> {
@@ -55,7 +57,7 @@ public class EpisodeListCursorAdapter
     } else {
       View cellView = LayoutInflater.from(parent.getContext())
         .inflate(R.layout.cell_episode, parent, false);
-      return new EpisodeListCursorAdapter.ChannelDetailViewHolder(cellView);
+      return new EpisodeListCursorAdapter.EpisodeViewHolder(cellView);
     }
   }
 
@@ -66,12 +68,17 @@ public class EpisodeListCursorAdapter
       Glide.with(mContext).load(mPMChannel.getImageURL()).into(channelDetailViewHolder.channelImage);
       channelDetailViewHolder.channelTitle.setText(mPMChannel.getTitle());
       if (mPMChannel.getDescription() != null) {
-        channelDetailViewHolder.channelDescription.setText(mPMChannel.getDescription());
+        channelDetailViewHolder.channelDescription
+          .setText(Html.fromHtml(mPMChannel.getDescription()).toString());
       } else {
         channelDetailViewHolder.channelDescription.setVisibility(View.GONE);
       }
     } else {
-
+      PMEpisode pmEpisode = new PMEpisode(cursor);
+      EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
+      episodeViewHolder.episodeTitle.setText(pmEpisode.getTitle());
+      episodeViewHolder.episodeDescription
+        .setText(Html.fromHtml(pmEpisode.getDescription()).toString());
     }
   }
 
@@ -93,6 +100,16 @@ public class EpisodeListCursorAdapter
       channelImage = (ImageView) cellView.findViewById(R.id.image_view_channel);
       channelTitle = (TextView) cellView.findViewById(R.id.text_view_channel_title);
       channelDescription = (TextView) cellView.findViewById(R.id.text_view_channel_description);
+    }
+  }
+
+  private static class EpisodeViewHolder extends RecyclerView.ViewHolder {;
+    final TextView episodeTitle;
+    final TextView episodeDescription;
+    EpisodeViewHolder(View cellView) {
+      super(cellView);
+      episodeTitle = (TextView) cellView.findViewById(R.id.text_view_episode_title);
+      episodeDescription = (TextView) cellView.findViewById(R.id.text_view_episode_description);
     }
   }
 }
