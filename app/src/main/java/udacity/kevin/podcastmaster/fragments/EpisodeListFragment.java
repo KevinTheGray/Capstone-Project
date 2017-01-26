@@ -14,9 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.adapters.EpisodeListCursorAdapter;
 import udacity.kevin.podcastmaster.data.PodcastContract;
+import udacity.kevin.podcastmaster.listeners.RecyclerViewItemClickListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
+import udacity.kevin.podcastmaster.models.PMEpisode;
 
 public class EpisodeListFragment extends Fragment
   implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -43,6 +46,20 @@ public class EpisodeListFragment extends Fragment
     RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.episodes_recycler_view);
     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     recyclerView.setAdapter(mEpisodeListCursorAdapter);
+
+    recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(),
+      new RecyclerViewItemClickListener.OnItemClickListener() {
+        @Override
+        public void onItemClick(View v, int position) {
+          if (position > 0) {
+            int modifiedPosition = position - 1;
+            mCurrentEpisodeListCursor.moveToPosition(modifiedPosition);
+            PMEpisode pmEpisode = new PMEpisode(mCurrentEpisodeListCursor);
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.episodeSelected(pmEpisode, mPMChannel);
+          }
+        }
+      }));
 
     return rootView;
   }

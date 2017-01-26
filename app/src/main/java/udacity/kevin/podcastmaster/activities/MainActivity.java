@@ -25,9 +25,11 @@ import com.google.android.gms.analytics.Tracker;
 
 import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.fragments.EpisodeDetailFragment;
 import udacity.kevin.podcastmaster.fragments.EpisodeListFragment;
 import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
 import udacity.kevin.podcastmaster.models.PMChannel;
+import udacity.kevin.podcastmaster.models.PMEpisode;
 
 public class MainActivity extends AppCompatActivity
   implements NavigationView.OnNavigationItemSelectedListener {
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity
   private final String SCREEN_NAME = "MainActivity";
   private MyFeedsFragment mMyFeedsFragment;
   private EpisodeListFragment mEpisodeListFragment;
+  private EpisodeDetailFragment mEpisodeDetailFragment;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +191,26 @@ public class MainActivity extends AppCompatActivity
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     fragmentTransaction.replace(R.id.fragment_container,
       mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
+    fragmentTransaction.addToBackStack(null);
+    fragmentTransaction.commit();
+  }
+
+  public void episodeSelected(PMEpisode pmEpisode, PMChannel pmChannel) {
+    Log.d(LOG_TAG, pmEpisode.getTitle());
+    // Todo: Handle tablet layout
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    mEpisodeDetailFragment = (EpisodeDetailFragment) fragmentManager
+      .findFragmentByTag(EpisodeDetailFragment.FRAGMENT_TAG);
+    if (mEpisodeDetailFragment == null) {
+      mEpisodeDetailFragment = new EpisodeDetailFragment();
+    }
+    Bundle fragmentBundle = new Bundle();
+    fragmentBundle.putParcelable(EpisodeDetailFragment.BUNDLE_KEY_EPISODE_PARCELABLE, pmEpisode);
+    fragmentBundle.putParcelable(EpisodeDetailFragment.BUNDLE_KEY_CHANNEL_PARCELABLE, pmChannel);
+    mEpisodeDetailFragment.setArguments(fragmentBundle);
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    fragmentTransaction.replace(R.id.fragment_container,
+      mEpisodeDetailFragment, EpisodeDetailFragment.FRAGMENT_TAG);
     fragmentTransaction.addToBackStack(null);
     fragmentTransaction.commit();
   }

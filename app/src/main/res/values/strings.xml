@@ -47,6 +47,10 @@
 	<string name="remove_feed_dialog_negative_text" translatable="true">@string/cancel</string>
 	<string name="remove_feed_dialog_positive_text" translatable="true">Remove %1$s</string>
 
+	<!-- Episode Detail -->
+	<string name="download_button_text" translatable="true">Download Now</string>
+	<string name="delete_download_button_text" translatable="true">Delete Download</string>
+
 	<!-- Generic strings used everywhere -->
 	<string name="OK">OK</string>
 	<string name="cancel">Cancel</string>
