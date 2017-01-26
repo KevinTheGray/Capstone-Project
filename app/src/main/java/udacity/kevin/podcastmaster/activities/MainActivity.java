@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity
   private MyFeedsFragment mMyFeedsFragment;
   private EpisodeListFragment mEpisodeListFragment;
   private EpisodeDetailFragment mEpisodeDetailFragment;
+  private boolean masterDetailLayoutAvailable = false;
+  private View detailFragmentContainer = null;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity
     mInterstitialAd = new InterstitialAd(this);
     mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
 
+    requestNewInterstitial();
     mInterstitialAd.setAdListener(new AdListener() {
       @Override
       public void onAdClosed() {
@@ -73,19 +77,25 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
-    requestNewInterstitial();
+    if (findViewById(R.id.fragment_container_master) != null) {
+      masterDetailLayoutAvailable = true;
+    }
 
-    // Todo: Handle tablet layout
+
     FragmentManager fragmentManager = getSupportFragmentManager();
-    mMyFeedsFragment = (MyFeedsFragment) fragmentManager.findFragmentByTag(MyFeedsFragment.FRAGMENT_TAG);
+    mMyFeedsFragment = (MyFeedsFragment) fragmentManager
+      .findFragmentByTag(MyFeedsFragment.FRAGMENT_TAG);
     if (mMyFeedsFragment == null) {
+      mMyFeedsFragment = new MyFeedsFragment();
+      int containerIDToAddTo =
+        masterDetailLayoutAvailable ? R.id.fragment_container_master : R.id.fragment_container;
       FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-      MyFeedsFragment myFeedsFragment = new MyFeedsFragment();
       fragmentTransaction
-        .add(R.id.fragment_container, myFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
+        .add(containerIDToAddTo, mMyFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
       fragmentTransaction.commit();
     }
 
+    detailFragmentContainer = findViewById(R.id.fragment_container_detail);
   }
 
   @Override
@@ -93,8 +103,7 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     if (getFragmentManager().getBackStackEntryCount() > 0) {
       getFragmentManager().popBackStack();
-    }
-    else if (drawer.isDrawerOpen(GravityCompat.START)) {
+    } else if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
     } else {
       super.onBackPressed();
@@ -189,8 +198,14 @@ public class MainActivity extends AppCompatActivity
     fragmentBundle.putParcelable(EpisodeListFragment.BUNDLE_KEY_CHANNEL_PARCELABLE, pmChannel);
     mEpisodeListFragment.setArguments(fragmentBundle);
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-    fragmentTransaction.replace(R.id.fragment_container,
-      mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
+    if (masterDetailLayoutAvailable) {
+      detailFragmentContainer.setVisibility(View.VISIBLE);
+      fragmentTransaction.replace(R.id.fragment_container_detail,
+        mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
+    } else {
+      fragmentTransaction.replace(R.id.fragment_container,
+        mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
+    }
     fragmentTransaction.addToBackStack(null);
     fragmentTransaction.commit();
   }
