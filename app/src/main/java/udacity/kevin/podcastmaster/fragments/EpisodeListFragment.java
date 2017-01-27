@@ -92,4 +92,9 @@ public class EpisodeListFragment extends Fragment
 
   }
 
+  public void loadNewChannel(PMChannel pmChannel) {
+    mPMChannel = pmChannel;
+    getLoaderManager().restartLoader(0, null, this);
+  }
+
 }

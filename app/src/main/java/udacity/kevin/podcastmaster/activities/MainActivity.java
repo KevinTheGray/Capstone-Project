@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity
   InterstitialAd mInterstitialAd;
   private final String LOG_TAG = "MainActivity";
   private final String SCREEN_NAME = "MainActivity";
+  private final String SHOW_DETAIL_KEY = "SHOW_DETAIL_KEY";
   private MyFeedsFragment mMyFeedsFragment;
   private EpisodeListFragment mEpisodeListFragment;
   private EpisodeDetailFragment mEpisodeDetailFragment;
@@ -77,8 +78,12 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
-    if (findViewById(R.id.fragment_container_master) != null) {
+    detailFragmentContainer = findViewById(R.id.fragment_container_detail);
+    if (detailFragmentContainer != null) {
       masterDetailLayoutAvailable = true;
+      if (savedInstanceState != null && savedInstanceState.getBoolean(SHOW_DETAIL_KEY, false)) {
+        detailFragmentContainer.setVisibility(View.VISIBLE);
+      }
     }
 
 
@@ -94,16 +99,12 @@ public class MainActivity extends AppCompatActivity
         .add(containerIDToAddTo, mMyFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
       fragmentTransaction.commit();
     }
-
-    detailFragmentContainer = findViewById(R.id.fragment_container_detail);
   }
 
   @Override
   public void onBackPressed() {
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-    if (getFragmentManager().getBackStackEntryCount() > 0) {
-      getFragmentManager().popBackStack();
-    } else if (drawer.isDrawerOpen(GravityCompat.START)) {
+    if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
     } else {
       super.onBackPressed();
@@ -116,6 +117,16 @@ public class MainActivity extends AppCompatActivity
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     return true;
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    if (masterDetailLayoutAvailable) {
+      if(findViewById(R.id.fragment_container_detail).getVisibility() == View.VISIBLE) {
+        outState.putBoolean(SHOW_DETAIL_KEY, true);
+      }
+    }
   }
 
   @Override
@@ -189,24 +200,25 @@ public class MainActivity extends AppCompatActivity
     Log.d(LOG_TAG, pmChannel.getTitle() + " selected");
     // Todo: Handle tablet layout
     FragmentManager fragmentManager = getSupportFragmentManager();
-    mEpisodeListFragment = (EpisodeListFragment) fragmentManager
-      .findFragmentByTag(EpisodeListFragment.FRAGMENT_TAG);
-    if (mEpisodeListFragment == null) {
-      mEpisodeListFragment = new EpisodeListFragment();
-    }
+    mEpisodeListFragment = new EpisodeListFragment();
     Bundle fragmentBundle = new Bundle();
     fragmentBundle.putParcelable(EpisodeListFragment.BUNDLE_KEY_CHANNEL_PARCELABLE, pmChannel);
     mEpisodeListFragment.setArguments(fragmentBundle);
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     if (masterDetailLayoutAvailable) {
+      // Clear backstack if possible
+      if (fragmentManager.getBackStackEntryCount() > 0) {
+        fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0)
+          .getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+      }
       detailFragmentContainer.setVisibility(View.VISIBLE);
       fragmentTransaction.replace(R.id.fragment_container_detail,
         mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
     } else {
       fragmentTransaction.replace(R.id.fragment_container,
         mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
+      fragmentTransaction.addToBackStack(null);
     }
-    fragmentTransaction.addToBackStack(null);
     fragmentTransaction.commit();
   }
 
@@ -214,18 +226,20 @@ public class MainActivity extends AppCompatActivity
     Log.d(LOG_TAG, pmEpisode.getTitle());
     // Todo: Handle tablet layout
     FragmentManager fragmentManager = getSupportFragmentManager();
-    mEpisodeDetailFragment = (EpisodeDetailFragment) fragmentManager
-      .findFragmentByTag(EpisodeDetailFragment.FRAGMENT_TAG);
-    if (mEpisodeDetailFragment == null) {
-      mEpisodeDetailFragment = new EpisodeDetailFragment();
-    }
+    mEpisodeDetailFragment = new EpisodeDetailFragment();
     Bundle fragmentBundle = new Bundle();
     fragmentBundle.putParcelable(EpisodeDetailFragment.BUNDLE_KEY_EPISODE_PARCELABLE, pmEpisode);
     fragmentBundle.putParcelable(EpisodeDetailFragment.BUNDLE_KEY_CHANNEL_PARCELABLE, pmChannel);
     mEpisodeDetailFragment.setArguments(fragmentBundle);
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-    fragmentTransaction.replace(R.id.fragment_container,
-      mEpisodeDetailFragment, EpisodeDetailFragment.FRAGMENT_TAG);
+    if (masterDetailLayoutAvailable) {
+      fragmentTransaction.replace(R.id.fragment_container_detail,
+        mEpisodeDetailFragment, EpisodeDetailFragment.FRAGMENT_TAG);
+    } else {
+      fragmentTransaction.replace(R.id.fragment_container,
+        mEpisodeDetailFragment, EpisodeDetailFragment.FRAGMENT_TAG);
+    }
+
     fragmentTransaction.addToBackStack(null);
     fragmentTransaction.commit();
   }
