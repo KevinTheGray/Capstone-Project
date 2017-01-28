@@ -29,6 +29,7 @@ import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.fragments.EpisodeDetailFragment;
 import udacity.kevin.podcastmaster.fragments.EpisodeListFragment;
 import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
+import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity
   private MyFeedsFragment mMyFeedsFragment;
   private EpisodeListFragment mEpisodeListFragment;
   private EpisodeDetailFragment mEpisodeDetailFragment;
+  private DownloadRequestListener mDownloadRequestListener;
   private boolean masterDetailLayoutAvailable = false;
   private View detailFragmentContainer = null;
 
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity
       @Override
       public void onAdClosed() {
         super.onAdClosed();
+        if(mDownloadRequestListener != null) {
+          mDownloadRequestListener.onBeginDownload();
+          mDownloadRequestListener = null;
+        }
         requestNewInterstitial();
       }
     });
@@ -242,6 +248,15 @@ public class MainActivity extends AppCompatActivity
 
     fragmentTransaction.addToBackStack(null);
     fragmentTransaction.commit();
+  }
+
+  public void showAd(DownloadRequestListener downloadRequestListener) {
+    if (mInterstitialAd.isLoaded()) {
+      mDownloadRequestListener = downloadRequestListener;
+      mInterstitialAd.show();
+    } else {
+      downloadRequestListener.onBeginDownload();
+    }
   }
 
 }

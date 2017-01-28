@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.activities.MainActivity;
+import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
 
-public class EpisodeDetailFragment extends Fragment {
+public class EpisodeDetailFragment extends Fragment implements DownloadRequestListener {
   public static final String FRAGMENT_TAG = "EpisodeDetailFragment";
   public static final String LOG_TAG = "EpisodeDetailFragment";
   public static final String BUNDLE_KEY_EPISODE_PARCELABLE = "BUNDLE_KEY_PM_EPISODE";
@@ -58,7 +61,25 @@ public class EpisodeDetailFragment extends Fragment {
     } else {
       episodeDescriptionTextView.setVisibility(View.GONE);
     }
+
+    rootView.findViewById(R.id.button_download).setOnClickListener(
+      new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          onDownloadNowButtonClicked(view);
+        }
+      }
+    );
     return rootView;
   }
 
+  public void onDownloadNowButtonClicked(View v) {
+    MainActivity mainActivity = (MainActivity) getActivity();
+    mainActivity.showAd(this);
+  }
+
+  @Override
+  public void onBeginDownload() {
+    Log.d(LOG_TAG, "YEAH");
+  }
 }
