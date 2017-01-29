@@ -1,5 +1,6 @@
 package udacity.kevin.podcastmaster.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
+import udacity.kevin.podcastmaster.networking.downloadcontent.DownloadEpisodeService;
 
 public class EpisodeDetailFragment extends Fragment implements DownloadRequestListener {
   public static final String FRAGMENT_TAG = "EpisodeDetailFragment";
@@ -81,5 +83,8 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
   @Override
   public void onBeginDownload() {
     Log.d(LOG_TAG, "YEAH");
+    Intent intent = new Intent(getActivity(), DownloadEpisodeService.class);
+    intent.putExtra(DownloadEpisodeService.INTENT_EXTRA_KEY_PM_EPISODE, mPMEpisode);
+    getActivity().startService(intent);
   }
 }

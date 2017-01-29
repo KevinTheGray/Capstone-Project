@@ -32,6 +32,9 @@
 			<item
 				android:id="@+id/nav_debug_copy_99pi"
 				android:title="Copy 99% Invisible"/>
+			<item
+				android:id="@+id/nav_debug_copy_npr_hourly"
+				android:title="Copy NPR Hourly"/>
 		</menu>
 	</item>
 

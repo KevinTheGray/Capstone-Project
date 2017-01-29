@@ -45,6 +45,10 @@
 			android:name=".networking.downloadrssfeed.DownloadRSSFeedService"
 			android:exported="false"/>
 
+		<service
+			android:name=".networking.downloadcontent.DownloadEpisodeService"
+			android:exported="false"/>
+
 		<provider
 			android:authorities="udacity.kevin.podcastmaster"
 			android:name=".data.PodcastProvider"

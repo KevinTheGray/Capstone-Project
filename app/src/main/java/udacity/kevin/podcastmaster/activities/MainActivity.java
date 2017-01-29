@@ -183,6 +183,8 @@ public class MainActivity extends AppCompatActivity
       clip = ClipData.newPlainText("fresh air rss url", "https://www.npr.org/rss/podcast.php?id=381444908");
     } else if (id == R.id.nav_debug_copy_99pi) {
       clip = ClipData.newPlainText("99pi rss url", "http://feeds.99percentinvisible.org/99percentinvisible.xml");
+    } else if (id == R.id.nav_debug_copy_npr_hourly) {
+      clip = ClipData.newPlainText("NPR Hourly rss url", "https://www.npr.org/rss/podcast.php?id=500005");
     }
 
     if (clip != null) {
