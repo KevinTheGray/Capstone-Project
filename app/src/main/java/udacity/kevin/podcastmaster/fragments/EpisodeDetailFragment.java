@@ -1,11 +1,13 @@
 package udacity.kevin.podcastmaster.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +21,16 @@ import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
+import udacity.kevin.podcastmaster.networking.downloadcontent.DownloadEpisodeReceiver;
 import udacity.kevin.podcastmaster.networking.downloadcontent.DownloadEpisodeService;
 
-public class EpisodeDetailFragment extends Fragment implements DownloadRequestListener {
+public class EpisodeDetailFragment extends Fragment implements DownloadRequestListener,
+  DownloadEpisodeReceiver.DownloadEpisodeReceiverCallback {
   public static final String FRAGMENT_TAG = "EpisodeDetailFragment";
   public static final String LOG_TAG = "EpisodeDetailFragment";
   public static final String BUNDLE_KEY_EPISODE_PARCELABLE = "BUNDLE_KEY_PM_EPISODE";
   public static final String BUNDLE_KEY_CHANNEL_PARCELABLE = "BUNDLE_KEY_PM_CHANNEL";
+  private DownloadEpisodeReceiver mDownloadEpisodeReceiver;
   private PMEpisode mPMEpisode;
   private PMChannel mPMChannel;
 
@@ -34,6 +39,15 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     super.onCreate(savedInstanceState);
     mPMEpisode = getArguments().getParcelable(BUNDLE_KEY_EPISODE_PARCELABLE);
     mPMChannel = getArguments().getParcelable(BUNDLE_KEY_CHANNEL_PARCELABLE);
+
+    IntentFilter downloadRSSFeedIntentFilter = new IntentFilter();
+    downloadRSSFeedIntentFilter.addAction(DownloadEpisodeService.BROADCAST_UPDATE_ACTION);
+    downloadRSSFeedIntentFilter.addAction(DownloadEpisodeService.BROADCAST_FINISHED_ACTION);
+
+    mDownloadEpisodeReceiver = new DownloadEpisodeReceiver();
+    LocalBroadcastManager.getInstance(getContext()).registerReceiver(mDownloadEpisodeReceiver,
+      downloadRSSFeedIntentFilter);
+    mDownloadEpisodeReceiver.setCallback(this);
   }
 
   @Nullable
@@ -75,6 +89,13 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     return rootView;
   }
 
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    mDownloadEpisodeReceiver.setCallback(null);
+    LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mDownloadEpisodeReceiver);
+  }
+
   public void onDownloadNowButtonClicked(View v) {
     MainActivity mainActivity = (MainActivity) getActivity();
     mainActivity.showAd(this);
@@ -82,9 +103,12 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
 
   @Override
   public void onBeginDownload() {
-    Log.d(LOG_TAG, "YEAH");
     Intent intent = new Intent(getActivity(), DownloadEpisodeService.class);
     intent.putExtra(DownloadEpisodeService.INTENT_EXTRA_KEY_PM_EPISODE, mPMEpisode);
     getActivity().startService(intent);
+  }
+
+  @Override
+  public void onDownloadEpisodeIntentReceived(Context context, Intent intent) {
   }
 }

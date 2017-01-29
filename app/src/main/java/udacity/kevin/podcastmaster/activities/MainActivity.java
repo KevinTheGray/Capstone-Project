@@ -13,7 +13,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -205,7 +204,6 @@ public class MainActivity extends AppCompatActivity
   }
 
   public void channelSelected(PMChannel pmChannel) {
-    Log.d(LOG_TAG, pmChannel.getTitle() + " selected");
     // Todo: Handle tablet layout
     FragmentManager fragmentManager = getSupportFragmentManager();
     mEpisodeListFragment = new EpisodeListFragment();
@@ -231,7 +229,6 @@ public class MainActivity extends AppCompatActivity
   }
 
   public void episodeSelected(PMEpisode pmEpisode, PMChannel pmChannel) {
-    Log.d(LOG_TAG, pmEpisode.getTitle());
     // Todo: Handle tablet layout
     FragmentManager fragmentManager = getSupportFragmentManager();
     mEpisodeDetailFragment = new EpisodeDetailFragment();

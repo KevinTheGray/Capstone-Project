@@ -50,6 +50,7 @@
 	<!-- Episode Detail -->
 	<string name="download_button_text" translatable="true">Download Now</string>
 	<string name="delete_download_button_text" translatable="true">Delete Download</string>
+	<string name="episode_download_progress_dialog_start">Starting download&#8230;</string>
 	<string name="episode_download_progress_dialog_known_percentage">Downloading episode&#8230;%1$s%%/</string>
 	<string name="episode_download_progress_dialog_unknown_percentage">Downloading episode, unable to determine percentage (blame the podcast provider), but it\'s downloading&#8230;%1$s/</string>
 

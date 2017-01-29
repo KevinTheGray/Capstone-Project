@@ -161,6 +161,6 @@ public class DownloadRSSFeedService extends IntentService {
   @Override
   public void onDestroy() {
     super.onDestroy();
-    Log.d(LOG_TAG, "Destroyed");
   }
+
 }

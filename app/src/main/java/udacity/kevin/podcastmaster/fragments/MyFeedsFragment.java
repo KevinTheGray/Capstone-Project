@@ -18,7 +18,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,7 +134,6 @@ public class MyFeedsFragment extends Fragment implements
 
   @Override
   public void onDownloadRSSFeedIntentReceived(Context context, Intent intent) {
-    Log.d(LOG_TAG, intent.getAction());
     if (intent.getAction().equals(DownloadRSSFeedService.BROADCAST_FINISHED_ACTION)) {
       if (mDownloadRSSFeedProgressDialog != null) {
         mDownloadRSSFeedProgressDialog.dismiss();

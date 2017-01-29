@@ -36,6 +36,8 @@ public class DownloadEpisodeService extends IntentService {
   public final static String INTENT_EXTRA_KEY_SUCCESS_MESSAGE =
     "udacity.kevin.podcastmaster.downloadepisodeservice.SUCCESS_MESSAGE";
 
+  public static PMEpisode currentlyDownloadingEpisode;
+
   public final String LOG_TAG = "DownloadEpisodeService";
 
   public DownloadEpisodeService() {
@@ -43,16 +45,10 @@ public class DownloadEpisodeService extends IntentService {
   }
 
   @Override
-  public int onStartCommand(Intent intent, int flags, int startId) {
-    Log.d(LOG_TAG, "onStartCommand");
-    return super.onStartCommand(intent, flags, startId);
-  }
-
-  @Override
   protected void onHandleIntent(Intent intent) {
     Intent finishedIntent = new Intent(BROADCAST_FINISHED_ACTION);
     Intent updateIntent = new Intent(BROADCAST_UPDATE_ACTION);
-    PMEpisode pmEpisode = intent.getParcelableExtra(INTENT_EXTRA_KEY_PM_EPISODE);
+    currentlyDownloadingEpisode = intent.getParcelableExtra(INTENT_EXTRA_KEY_PM_EPISODE);
 
     URL episodeURL = null;
     HttpURLConnection httpURLConnection = null;
@@ -60,10 +56,9 @@ public class DownloadEpisodeService extends IntentService {
     try {
       // Keep opening connection until
       // Connect and download the file
-      episodeURL = new URL(pmEpisode.getEnclosureURL());
+      episodeURL = new URL(currentlyDownloadingEpisode.getEnclosureURL());
       httpURLConnection = (HttpURLConnection) episodeURL.openConnection();
       int responseCode = httpURLConnection.getResponseCode();
-      Log.d(LOG_TAG, "Response code: " + httpURLConnection.getResponseCode());
 
       while (responseCode != HttpURLConnection.HTTP_OK) {
         // Try to redirect or fail
@@ -81,13 +76,10 @@ public class DownloadEpisodeService extends IntentService {
         }
       }
 
-      Log.d(LOG_TAG, "Location: " + httpURLConnection.getHeaderField("Location"));
-
 
       inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
       // OutputStream output = new FileOutputStream("/sdcard/BarcodeScanner-debug.apk");
       int fileLength = httpURLConnection.getContentLength();
-      Log.d(LOG_TAG, "The length of the file is:" + fileLength);
       byte data[] = new byte[1024];
       long total = 0;
       int count;
@@ -99,7 +91,6 @@ public class DownloadEpisodeService extends IntentService {
         // resultData.putInt("progress" ,(int) (total * 100 / fileLength));
         // receiver.send(UPDATE_PROGRESS, resultData);
         // output.write(data, 0, count);
-        // Log.d(LOG_TAG, "Bytes to string: " + new String(data));
 
         if (fileLength > 0) {
           float percentageComplete = ((((float)total) / ((float)fileLength)) * 100.0f);
@@ -108,18 +99,15 @@ public class DownloadEpisodeService extends IntentService {
           updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
             getResources().getString(R.string.episode_download_progress_dialog_known_percentage,
               percentageCompleteString));
-          Log.d(LOG_TAG, "Downloaded: " + percentageCompleteString + "%");
         } else {
           updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
             getResources().getString(R.string.episode_download_progress_dialog_unknown_percentage,
               "" + total + " bytes"));
-          Log.d(LOG_TAG, "Downloaded: " + total);
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
       }
 //      output.flush();
 //      output.close();
-      Log.d(LOG_TAG, "DONE! Downloaded: " + total + " fileLength: " + fileLength);
       inputStream.close();
     } catch (IOException ioException) {
       finishedIntent.putExtra(INTENT_EXTRA_KEY_ERROR_CODE,
@@ -127,7 +115,7 @@ public class DownloadEpisodeService extends IntentService {
       finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
       finishedIntent.putExtra(INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE,
         ioException.getMessage());
-
+      LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
       return;
     }
     finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
@@ -138,5 +126,6 @@ public class DownloadEpisodeService extends IntentService {
   @Override
   public void onDestroy() {
     super.onDestroy();
+    currentlyDownloadingEpisode = null;
   }
 }

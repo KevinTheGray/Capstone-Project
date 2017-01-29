@@ -3,7 +3,6 @@ package udacity.kevin.podcastmaster.networking.downloadrssfeed;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class DownloadRSSFeedReceiver extends BroadcastReceiver {
   private final String LOG_TAG = "DownloadRSSFeedReceiver";
@@ -11,7 +10,6 @@ public class DownloadRSSFeedReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    Log.d(LOG_TAG, intent.getAction());
     if (this.mCallback != null) {
       this.mCallback.onDownloadRSSFeedIntentReceived(context, intent);
     }
