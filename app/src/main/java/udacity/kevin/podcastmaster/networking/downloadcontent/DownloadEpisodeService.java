@@ -1,11 +1,14 @@
 package udacity.kevin.podcastmaster.networking.downloadcontent;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -49,6 +52,8 @@ public class DownloadEpisodeService extends IntentService {
     Intent finishedIntent = new Intent(BROADCAST_FINISHED_ACTION);
     Intent updateIntent = new Intent(BROADCAST_UPDATE_ACTION);
     currentlyDownloadingEpisode = intent.getParcelableExtra(INTENT_EXTRA_KEY_PM_EPISODE);
+    String filename = currentlyDownloadingEpisode.getGuid().replaceAll("\\s+","");
+    boolean fileDownloadComplete = false;
 
     URL episodeURL = null;
     HttpURLConnection httpURLConnection = null;
@@ -76,9 +81,8 @@ public class DownloadEpisodeService extends IntentService {
         }
       }
 
-
       inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
-      // OutputStream output = new FileOutputStream("/sdcard/BarcodeScanner-debug.apk");
+      FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
       int fileLength = httpURLConnection.getContentLength();
       byte data[] = new byte[1024];
       long total = 0;
@@ -86,16 +90,13 @@ public class DownloadEpisodeService extends IntentService {
 
       while ((count = inputStream.read(data)) != -1) {
         total += count;
-        // publishing the progress....
-        // Bundle resultData = new Bundle();
-        // resultData.putInt("progress" ,(int) (total * 100 / fileLength));
-        // receiver.send(UPDATE_PROGRESS, resultData);
-        // output.write(data, 0, count);
+        outputStream.write(data, 0, count);
 
         if (fileLength > 0) {
           float percentageComplete = ((((float)total) / ((float)fileLength)) * 100.0f);
           String percentageCompleteString = String.format(Locale.ENGLISH, "%.2f",
             percentageComplete);
+          Log.d(LOG_TAG, percentageCompleteString);
           updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
             getResources().getString(R.string.episode_download_progress_dialog_known_percentage,
               percentageCompleteString));
@@ -106,16 +107,24 @@ public class DownloadEpisodeService extends IntentService {
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
       }
-//      output.flush();
-//      output.close();
+      outputStream.flush();
+      outputStream.close();
       inputStream.close();
     } catch (IOException ioException) {
+      Log.e(LOG_TAG, ioException.getMessage());
       finishedIntent.putExtra(INTENT_EXTRA_KEY_ERROR_CODE,
         DownloadEpisodeExceptionCodes.DATA_RETRIEVAL_FAILED);
       finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
       finishedIntent.putExtra(INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE,
         ioException.getMessage());
       LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
+      File file = new File(getFilesDir(), filename);
+      if (file.exists()) {
+        boolean fileDeleted = file.delete();
+        if (!fileDeleted) {
+          Log.e(LOG_TAG, "There was an error downloading the file and it wasn't deleted");
+        }
+      }
       return;
     }
     finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
