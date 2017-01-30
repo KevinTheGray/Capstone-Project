@@ -15,7 +15,7 @@ public class PMEpisode implements Parcelable {
   private String duration;
   private String enclosureURL;
   private String guid;
-  private String downloadedMediaURI;
+  private String downloadedMediaFilename;
 
   public PMEpisode(Cursor cursor) {
     this.id =
@@ -34,7 +34,7 @@ public class PMEpisode implements Parcelable {
       cursor.getString(cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_ENCLOSURE_URL));
     this.guid =
       cursor.getString(cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_GUID));
-    this.downloadedMediaURI =
+    this.downloadedMediaFilename =
       cursor.getString(cursor
         .getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI));
   }
@@ -67,8 +67,8 @@ public class PMEpisode implements Parcelable {
     return guid;
   }
 
-  public String getDownloadedMediaURI() {
-    return downloadedMediaURI;
+  public String getDownloadedMediaFilename() {
+    return downloadedMediaFilename;
   }
 
   public long getChannelID() {
@@ -90,7 +90,7 @@ public class PMEpisode implements Parcelable {
     parcel.writeString(this.duration);
     parcel.writeString(this.enclosureURL);
     parcel.writeString(this.guid);
-    parcel.writeString(this.downloadedMediaURI);
+    parcel.writeString(this.downloadedMediaFilename);
   }
 
   public static final Parcelable.Creator<PMEpisode> CREATOR = new Parcelable.Creator<PMEpisode>() {
@@ -111,6 +111,6 @@ public class PMEpisode implements Parcelable {
     this.duration = in.readString();
     this.enclosureURL = in.readString();
     this.guid = in.readString();
-    this.downloadedMediaURI = in.readString();
+    this.downloadedMediaFilename = in.readString();
   }
 }

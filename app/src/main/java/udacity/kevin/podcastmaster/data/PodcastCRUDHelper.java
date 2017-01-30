@@ -114,7 +114,7 @@ public class PodcastCRUDHelper {
           }
         } else {
           episodeValues.put(PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI,
-            pmEpisode.getDownloadedMediaURI());
+            pmEpisode.getDownloadedMediaFilename());
           int updateCount = contentResolver.update(PodcastContract.EpisodeEntry.CONTENT_URI,
             episodeValues, PodcastContract.EpisodeEntry._ID + " = ?",
             new String[]{String.valueOf(pmEpisode.getID())});
@@ -128,6 +128,19 @@ public class PodcastCRUDHelper {
     returnedHashMap.put(URI_RETURN_KEY, returnedChannelUri);
     returnedHashMap.put(URI_WAS_INSERTED_KEY, wasInserted);
     return returnedHashMap;
+  }
+
+  public PMEpisode updatedDownloadedEpisode(PMEpisode pmEpisode, String filename) {
+    ContentValues episodeValues = new ContentValues();
+    episodeValues.put(PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI,
+      filename);
+    int updateCount = contentResolver.update(PodcastContract.EpisodeEntry.CONTENT_URI,
+      episodeValues, PodcastContract.EpisodeEntry._ID + " = ?",
+      new String[]{String.valueOf(pmEpisode.getID())});
+    if (updateCount != 1) {
+      return null;
+    }
+    return findEpisodeByGUIDOrNull(pmEpisode.getGuid());
   }
 
   public void deletePMChannel(PMChannel pmChannel) {

@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.Locale;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
 import udacity.kevin.podcastmaster.exceptions.DownloadEpisodeExceptionCodes;
 import udacity.kevin.podcastmaster.models.PMEpisode;
 
@@ -40,6 +41,7 @@ public class DownloadEpisodeService extends IntentService {
     "udacity.kevin.podcastmaster.downloadepisodeservice.SUCCESS_MESSAGE";
 
   public static PMEpisode currentlyDownloadingEpisode;
+  public static String currentlyDownloadingMessage;
 
   public final String LOG_TAG = "DownloadEpisodeService";
 
@@ -48,11 +50,19 @@ public class DownloadEpisodeService extends IntentService {
   }
 
   @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    currentlyDownloadingEpisode = intent.getParcelableExtra(INTENT_EXTRA_KEY_PM_EPISODE);
+    currentlyDownloadingMessage = getString(R.string.episode_download_progress_dialog_start);
+    return super.onStartCommand(intent, flags, startId);
+  }
+
+  @Override
   protected void onHandleIntent(Intent intent) {
     Intent finishedIntent = new Intent(BROADCAST_FINISHED_ACTION);
     Intent updateIntent = new Intent(BROADCAST_UPDATE_ACTION);
-    currentlyDownloadingEpisode = intent.getParcelableExtra(INTENT_EXTRA_KEY_PM_EPISODE);
     String filename = currentlyDownloadingEpisode.getGuid().replaceAll("\\s+","");
+    filename = filename.replace("\\", "");
+    filename = filename.replace("/", "");
     boolean fileDownloadComplete = false;
 
     URL episodeURL = null;
@@ -97,13 +107,14 @@ public class DownloadEpisodeService extends IntentService {
           String percentageCompleteString = String.format(Locale.ENGLISH, "%.2f",
             percentageComplete);
           Log.d(LOG_TAG, percentageCompleteString);
-          updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
-            getResources().getString(R.string.episode_download_progress_dialog_known_percentage,
-              percentageCompleteString));
+          currentlyDownloadingMessage = getResources()
+            .getString(R.string.episode_download_progress_dialog_known_percentage,
+              percentageCompleteString);
+          updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE, currentlyDownloadingMessage);
         } else {
-          updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE,
-            getResources().getString(R.string.episode_download_progress_dialog_unknown_percentage,
-              "" + total + " bytes"));
+          currentlyDownloadingMessage = getResources()
+            .getString(R.string.episode_download_progress_dialog_unknown_percentage, "" + total);
+          updateIntent.putExtra(INTENT_EXTRA_KEY_UPDATE_MESSAGE, currentlyDownloadingMessage);
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
       }
@@ -117,7 +128,6 @@ public class DownloadEpisodeService extends IntentService {
       finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
       finishedIntent.putExtra(INTENT_EXTRA_KEY_DETAILED_ERROR_MESSAGE,
         ioException.getMessage());
-      LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
       File file = new File(getFilesDir(), filename);
       if (file.exists()) {
         boolean fileDeleted = file.delete();
@@ -125,9 +135,24 @@ public class DownloadEpisodeService extends IntentService {
           Log.e(LOG_TAG, "There was an error downloading the file and it wasn't deleted");
         }
       }
+      LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
       return;
     }
-    finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
+    PodcastCRUDHelper podcastCRUDHelper = new PodcastCRUDHelper(getContentResolver());
+    PMEpisode updatedPMEpisode = podcastCRUDHelper.updatedDownloadedEpisode(
+      currentlyDownloadingEpisode, filename);
+    if (updatedPMEpisode == null) {
+      File file = new File(getFilesDir(), filename);
+      if (file.exists()) {
+        boolean fileDeleted = file.delete();
+        if (!fileDeleted) {
+          Log.e(LOG_TAG, "There was an error downloading the file and it wasn't deleted");
+        }
+      }
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
+    } else {
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
+    }
     LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
   }
 
@@ -136,5 +161,6 @@ public class DownloadEpisodeService extends IntentService {
   public void onDestroy() {
     super.onDestroy();
     currentlyDownloadingEpisode = null;
+    currentlyDownloadingMessage = null;
   }
 }

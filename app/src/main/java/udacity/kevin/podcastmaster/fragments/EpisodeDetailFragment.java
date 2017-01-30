@@ -11,7 +11,9 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -33,6 +35,9 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
   private DownloadEpisodeReceiver mDownloadEpisodeReceiver;
   private PMEpisode mPMEpisode;
   private PMChannel mPMChannel;
+  private Button mDownloadButton;
+  private LinearLayout mDownloadedButtonBar;
+  private TextView mDownloadDetailMessage;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +69,11 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     TextView episodeDurationTextView =
       (TextView) rootView.findViewById(R.id.text_view_episode_duration);
 
+    mDownloadButton = (Button) rootView.findViewById(R.id.button_download);
+    mDownloadedButtonBar = (LinearLayout)
+      rootView.findViewById(R.id.linear_layout_downloaded_button_bar);
+    mDownloadDetailMessage = (TextView) rootView.findViewById(R.id.text_view_download_message);
+
     Glide.with(getActivity()).load(mPMChannel.getImageURL()).into(imageView);
     episodeTitleTextView.setText(Html.fromHtml(mPMEpisode.getTitle()).toString());
     episodePubDateTextView.setText(mPMEpisode.getPubDate());
@@ -86,6 +96,8 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
         }
       }
     );
+
+    layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
     return rootView;
   }
 
@@ -101,14 +113,61 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     mainActivity.showAd(this);
   }
 
+  public void onDeleteButtonClicked(View v) {
+  }
+
+  public void onPlayButtonClicked(View v) {
+  }
+
   @Override
   public void onBeginDownload() {
     Intent intent = new Intent(getActivity(), DownloadEpisodeService.class);
     intent.putExtra(DownloadEpisodeService.INTENT_EXTRA_KEY_PM_EPISODE, mPMEpisode);
     getActivity().startService(intent);
+    DownloadEpisodeService.currentlyDownloadingEpisode = mPMEpisode;
+    DownloadEpisodeService.currentlyDownloadingMessage =
+      getString(R.string.episode_download_progress_dialog_start);
+    layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
   }
 
   @Override
   public void onDownloadEpisodeIntentReceived(Context context, Intent intent) {
+//    if (intent.getAction().equals(DownloadEpisodeService.BROADCAST_UPDATE_ACTION)) {
+//      layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
+//    } else if (intent.getAction().equals(DownloadEpisodeService.BROADCAST_FINISHED_ACTION)) {
+//      layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
+//    }
+    layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
+  }
+
+  private void layoutDownloadInformation(@Nullable PMEpisode currentlyDownloadingEpisode,
+                                         @Nullable String detailMessage) {
+
+    // Check if it's downloaded
+    if (mPMEpisode.getDownloadedMediaFilename() != null) {
+      mDownloadButton.setVisibility(View.GONE);
+      mDownloadDetailMessage.setVisibility(View.GONE);
+      mDownloadedButtonBar.setVisibility(View.VISIBLE);
+    } else {
+      mDownloadButton.setVisibility(View.VISIBLE);
+      mDownloadedButtonBar.setVisibility(View.GONE);
+      if (currentlyDownloadingEpisode != null) {
+        mDownloadDetailMessage.setVisibility(View.VISIBLE);
+        mDownloadButton.setEnabled(false);
+        if (currentlyDownloadingEpisode.getID() == mPMEpisode.getID()) {
+          if (detailMessage == null) {
+            mDownloadDetailMessage.setText(DownloadEpisodeService.currentlyDownloadingMessage);
+          } else {
+            mDownloadDetailMessage.setText(DownloadEpisodeService.currentlyDownloadingMessage);
+          }
+        } else {
+          mDownloadDetailMessage.setText(getString(R.string.episode_download_only_one_allowed,
+            currentlyDownloadingEpisode.getTitle()));
+        }
+      } else {
+        mDownloadDetailMessage.setVisibility(View.GONE);
+        mDownloadButton.setEnabled(true);
+      }
+    }
   }
 }
