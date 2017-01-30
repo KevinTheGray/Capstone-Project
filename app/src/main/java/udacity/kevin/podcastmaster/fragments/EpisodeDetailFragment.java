@@ -132,11 +132,14 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
 
   @Override
   public void onDownloadEpisodeIntentReceived(Context context, Intent intent) {
-//    if (intent.getAction().equals(DownloadEpisodeService.BROADCAST_UPDATE_ACTION)) {
-//      layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
-//    } else if (intent.getAction().equals(DownloadEpisodeService.BROADCAST_FINISHED_ACTION)) {
-//      layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
-//    }
+    if (intent.getAction().equals(DownloadEpisodeService.BROADCAST_FINISHED_ACTION)) {
+      boolean success =
+        intent.getBooleanExtra(DownloadEpisodeService.INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
+      if (success) {
+        mPMEpisode = intent.getParcelableExtra(
+          DownloadEpisodeService.INTENT_EXTRA_KEY_UPDATED_EPISODE);
+      }
+    }
     layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
   }
 

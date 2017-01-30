@@ -2,6 +2,7 @@ package udacity.kevin.podcastmaster.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -44,10 +45,16 @@ public class PodcastProvider extends ContentProvider {
       retCursor = mOpenHelper.getReadableDatabase().query(
         PodcastContract.ChannelEntry.TABLE_NAME, projection, selection, selectionArgs, null,
         null, sortOrder);
+      if (retCursor != null && getContext() != null) {
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+      }
     } else if (match == EPISODES) {
       retCursor = mOpenHelper.getReadableDatabase().query(
         PodcastContract.EpisodeEntry.TABLE_NAME, projection, selection, selectionArgs, null,
         null, sortOrder);
+      if (retCursor != null && getContext() != null) {
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+      }
     } else {
       throw new UnsupportedOperationException("Unknown uri: " + uri);
     }
@@ -71,6 +78,12 @@ public class PodcastProvider extends ContentProvider {
       updateCount = db.update(PodcastContract.EpisodeEntry.TABLE_NAME, contentValues, s, strings);
     } else {
       throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
+    if (updateCount != 0) {
+      Context context = getContext();
+      if (context != null) {
+       context.getContentResolver().notifyChange(uri, null);
+      }
     }
     return updateCount;
   }

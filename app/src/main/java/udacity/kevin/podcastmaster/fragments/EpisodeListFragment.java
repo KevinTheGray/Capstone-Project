@@ -9,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +90,7 @@ public class EpisodeListFragment extends Fragment
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader) {
-
+    Log.d(LOG_TAG, "Loader reset");
   }
 
   public void loadNewChannel(PMChannel pmChannel) {

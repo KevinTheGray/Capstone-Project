@@ -37,6 +37,8 @@ public class DownloadEpisodeService extends IntentService {
     "udacity.kevin.podcastmaster.downloadepisodeservice.FINISHED_SUCCESS_KEY";
   public final static String INTENT_EXTRA_KEY_UPDATE_MESSAGE =
     "udacity.kevin.podcastmaster.downloadepisodeservice.UPDATE_MESSAGE";
+  public final static String INTENT_EXTRA_KEY_UPDATED_EPISODE =
+    "udacity.kevin.podcastmaster.downloadepisodeservice.UPDATED_EPISODE";
   public final static String INTENT_EXTRA_KEY_SUCCESS_MESSAGE =
     "udacity.kevin.podcastmaster.downloadepisodeservice.SUCCESS_MESSAGE";
 
@@ -149,8 +151,11 @@ public class DownloadEpisodeService extends IntentService {
           Log.e(LOG_TAG, "There was an error downloading the file and it wasn't deleted");
         }
       }
+      currentlyDownloadingEpisode = null;
       finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, false);
     } else {
+      currentlyDownloadingEpisode = updatedPMEpisode;
+      finishedIntent.putExtra(INTENT_EXTRA_KEY_UPDATED_EPISODE, updatedPMEpisode);
       finishedIntent.putExtra(INTENT_EXTRA_KEY_FINISHED_SUCCESS, true);
     }
     LocalBroadcastManager.getInstance(this).sendBroadcast(finishedIntent);
