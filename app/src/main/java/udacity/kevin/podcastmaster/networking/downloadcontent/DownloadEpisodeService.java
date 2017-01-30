@@ -65,6 +65,8 @@ public class DownloadEpisodeService extends IntentService {
     String filename = currentlyDownloadingEpisode.getGuid().replaceAll("\\s+","");
     filename = filename.replace("\\", "");
     filename = filename.replace("/", "");
+    String[] segments = currentlyDownloadingEpisode.getEnclosureURL().split("/");
+    filename = segments[segments.length-1];
     boolean fileDownloadComplete = false;
 
     URL episodeURL = null;

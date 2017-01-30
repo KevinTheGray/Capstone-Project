@@ -3,6 +3,8 @@ package udacity.kevin.podcastmaster.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+
+import java.io.File;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.activities.MainActivity;
@@ -136,6 +140,12 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
   }
 
   public void onPlayButtonClicked(View v) {
+    File file = new File(getContext().getFilesDir(), mPMEpisode.getDownloadedMediaFilename());
+    Uri uri = Uri.fromFile(file);
+    MediaPlayer mp = MediaPlayer.create(getActivity(),
+      Uri.fromFile(new File(getContext().getFilesDir(), mPMEpisode.getDownloadedMediaFilename())));
+    mp.setLooping(true);
+    mp.start();
   }
 
   @Override
