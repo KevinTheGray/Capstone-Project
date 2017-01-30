@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.activities.MainActivity;
+import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
 import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
@@ -88,7 +89,7 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
       episodeDescriptionTextView.setVisibility(View.GONE);
     }
 
-    rootView.findViewById(R.id.button_download).setOnClickListener(
+    mDownloadButton.setOnClickListener(
       new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -96,6 +97,18 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
         }
       }
     );
+    rootView.findViewById(R.id.button_delete).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        onDeleteButtonClicked(view);
+      }
+    });
+    rootView.findViewById(R.id.button_play).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        onPlayButtonClicked(view);
+      }
+    });
 
     layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
     return rootView;
@@ -114,6 +127,12 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
   }
 
   public void onDeleteButtonClicked(View v) {
+    PodcastCRUDHelper podcastCRUDHelper = new PodcastCRUDHelper(getContext().getContentResolver());
+    PMEpisode pmEpisode = podcastCRUDHelper.deletePMEpisodeDownload(getContext(), mPMEpisode);
+    if (pmEpisode != null) {
+      mPMEpisode = pmEpisode;
+      layoutDownloadInformation(DownloadEpisodeService.currentlyDownloadingEpisode, null);
+    }
   }
 
   public void onPlayButtonClicked(View v) {

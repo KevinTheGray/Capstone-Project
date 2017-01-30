@@ -213,7 +213,7 @@ public class MyFeedsFragment extends Fragment implements
         @Override
         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
           PodcastCRUDHelper crudHelper = new PodcastCRUDHelper(getActivity().getContentResolver());
-          crudHelper.deletePMChannel(pmChannel);
+          crudHelper.deletePMChannel(pmChannel, getContext());
           getLoaderManager().restartLoader(0, null, loaderCallbacks);
         }
       })

@@ -2,10 +2,12 @@ package udacity.kevin.podcastmaster.data;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import java.io.File;
 import java.util.HashMap;
 
 import udacity.kevin.podcastmaster.models.PMChannel;
@@ -143,7 +145,44 @@ public class PodcastCRUDHelper {
     return findEpisodeByGUIDOrNull(pmEpisode.getGuid());
   }
 
-  public void deletePMChannel(PMChannel pmChannel) {
+  public PMEpisode deletePMEpisodeDownload(Context context, PMEpisode pmEpisode) {
+    if (pmEpisode.getDownloadedMediaFilename() == null) {
+      return null;
+    }
+
+    File file = new File(context.getFilesDir(), pmEpisode.getDownloadedMediaFilename());
+    if (file.exists()) {
+      boolean fileDeleted = file.delete();
+      if (!fileDeleted) {
+        Log.e(LOG_TAG, "There was an error downloading the file and it wasn't deleted");
+        return null;
+      }
+    }
+    return updatedDownloadedEpisode(pmEpisode, null);
+  }
+
+  public void deletePMChannel(PMChannel pmChannel, Context context) {
+    Cursor downloadCursor = contentResolver.query(PodcastContract.EpisodeEntry.CONTENT_URI,
+      new String[]{PodcastContract.EpisodeEntry._ID,
+        PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI},
+      PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI + " IS NOT NULL",
+      null, null);
+    if (downloadCursor != null) {
+      downloadCursor.moveToFirst();
+      while(!downloadCursor.isAfterLast()) {
+        String filename = downloadCursor.getString(downloadCursor
+          .getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI));
+        File file = new File(context.getFilesDir(), filename);
+        if (file.exists()) {
+          boolean fileDeleted = file.delete();
+          if (!fileDeleted) {
+            Log.e(LOG_TAG, "There was an error deleting the file and it wasn't deleted");
+          }
+        }
+        downloadCursor.moveToNext();
+      }
+      downloadCursor.close();
+    }
     contentResolver.delete(PodcastContract.ChannelEntry.CONTENT_URI,
       PodcastContract.ChannelEntry._ID + " = ?",
       new String[] {String.valueOf(pmChannel.getID())});
