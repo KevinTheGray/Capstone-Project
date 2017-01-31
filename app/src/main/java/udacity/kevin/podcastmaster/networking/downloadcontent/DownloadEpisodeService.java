@@ -110,7 +110,6 @@ public class DownloadEpisodeService extends IntentService {
           float percentageComplete = ((((float)total) / ((float)fileLength)) * 100.0f);
           String percentageCompleteString = String.format(Locale.ENGLISH, "%.2f",
             percentageComplete);
-          Log.d(LOG_TAG, percentageCompleteString);
           currentlyDownloadingMessage = getResources()
             .getString(R.string.episode_download_progress_dialog_known_percentage,
               percentageCompleteString);

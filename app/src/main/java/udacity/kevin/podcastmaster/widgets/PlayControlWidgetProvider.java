@@ -15,6 +15,12 @@ public class PlayControlWidgetProvider extends AppWidgetProvider {
   static final String PLAY_CONTROL_ACTION = "udacity.kevin.podcastmaster.PLAY_CONTROL_ACTION";
   static final String SEEK_FORWARD_ACTION = "udacity.kevin.podcastmaster.SEEK_FORWARD_ACTION";
   static final String SEEK_BACKWARD_ACTION = "udacity.kevin.podcastmaster.SEEK_BACKWARD_ACTION";
+
+  @Override
+  public void onEnabled(Context context) {
+    super.onEnabled(context);
+  }
+
   @Override
   public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
     // Perform this loop procedure for each App Widget that belongs to this provider
