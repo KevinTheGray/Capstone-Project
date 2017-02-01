@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +26,7 @@ import com.google.android.gms.analytics.Tracker;
 
 import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.fragments.DownloadListFragment;
 import udacity.kevin.podcastmaster.fragments.EpisodeDetailFragment;
 import udacity.kevin.podcastmaster.fragments.EpisodeListFragment;
 import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
@@ -40,7 +42,6 @@ public class MainActivity extends AppCompatActivity
   private final String LOG_TAG = "MainActivity";
   private final String SCREEN_NAME = "MainActivity";
   private final String SHOW_DETAIL_KEY = "SHOW_DETAIL_KEY";
-  private MyFeedsFragment mMyFeedsFragment;
   private EpisodeListFragment mEpisodeListFragment;
   private EpisodeDetailFragment mEpisodeDetailFragment;
   private DownloadRequestListener mDownloadRequestListener;
@@ -93,15 +94,15 @@ public class MainActivity extends AppCompatActivity
 
 
     FragmentManager fragmentManager = getSupportFragmentManager();
-    mMyFeedsFragment = (MyFeedsFragment) fragmentManager
+    MyFeedsFragment myFeedsFragment = (MyFeedsFragment) fragmentManager
       .findFragmentByTag(MyFeedsFragment.FRAGMENT_TAG);
-    if (mMyFeedsFragment == null) {
-      mMyFeedsFragment = new MyFeedsFragment();
+    if (myFeedsFragment == null) {
+      myFeedsFragment = new MyFeedsFragment();
       int containerIDToAddTo =
         masterDetailLayoutAvailable ? R.id.fragment_container_master : R.id.fragment_container;
       FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
       fragmentTransaction
-        .add(containerIDToAddTo, mMyFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
+        .add(containerIDToAddTo, myFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
       fragmentTransaction.commit();
     }
   }
@@ -163,8 +164,8 @@ public class MainActivity extends AppCompatActivity
     // Handle navigation view item clicks here.
     int id = item.getItemId();
 
-    if (id == R.id.nav_my_feeds) {
-    } else if (id == R.id.my_downloads) {
+    if (id == R.id.nav_my_feeds || id == R.id.my_downloads) {
+      layoutForMenuSelection(id);
     }
 
     // Debug stuff only
@@ -204,7 +205,6 @@ public class MainActivity extends AppCompatActivity
   }
 
   public void channelSelected(PMChannel pmChannel) {
-    // Todo: Handle tablet layout
     FragmentManager fragmentManager = getSupportFragmentManager();
     mEpisodeListFragment = new EpisodeListFragment();
     Bundle fragmentBundle = new Bundle();
@@ -213,10 +213,7 @@ public class MainActivity extends AppCompatActivity
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     if (masterDetailLayoutAvailable) {
       // Clear backstack if possible
-      if (fragmentManager.getBackStackEntryCount() > 0) {
-        fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0)
-          .getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-      }
+      clearBackstack();
       detailFragmentContainer.setVisibility(View.VISIBLE);
       fragmentTransaction.replace(R.id.fragment_container_detail,
         mEpisodeListFragment, EpisodeListFragment.FRAGMENT_TAG);
@@ -249,12 +246,45 @@ public class MainActivity extends AppCompatActivity
     fragmentTransaction.commit();
   }
 
+  public void layoutForMenuSelection(int id) {
+    Fragment fragmentToDisplay;
+    String fragmentTag;
+    clearBackstack();
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    if (id == R.id.nav_my_feeds) {
+      fragmentToDisplay = new MyFeedsFragment();
+      fragmentTag = MyFeedsFragment.FRAGMENT_TAG;
+    } else {
+      fragmentToDisplay = new DownloadListFragment();
+      fragmentTag = DownloadListFragment.FRAGMENT_TAG;
+    }
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    if (masterDetailLayoutAvailable) {
+      fragmentTransaction.replace(R.id.fragment_container_master, fragmentToDisplay, fragmentTag);
+    } else {
+      fragmentTransaction.replace(R.id.fragment_container, fragmentToDisplay, fragmentTag);
+    }
+    fragmentTransaction.commit();
+
+    if (masterDetailLayoutAvailable) {
+      detailFragmentContainer.setVisibility(View.GONE);
+    }
+  }
+
   public void showAd(DownloadRequestListener downloadRequestListener) {
     if (mInterstitialAd.isLoaded()) {
       mDownloadRequestListener = downloadRequestListener;
       mInterstitialAd.show();
     } else {
       downloadRequestListener.onBeginDownload();
+    }
+  }
+
+  private void clearBackstack() {
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    if (fragmentManager.getBackStackEntryCount() > 0) {
+      fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0)
+        .getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
   }
 
