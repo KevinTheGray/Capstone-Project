@@ -255,10 +255,17 @@ public class MainActivity extends AppCompatActivity
   }
 
   public void layoutForMenuSelection(int id) {
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    Fragment showingFragment = fragmentManager.findFragmentById(masterDetailLayoutAvailable ?
+      R.id.fragment_container_master : R.id.fragment_container);
+    if (showingFragment instanceof MyFeedsFragment && id == R.id.nav_my_feeds ||
+      showingFragment instanceof DownloadListFragment && id == R.id.my_downloads) {
+      return;
+    }
+
     Fragment fragmentToDisplay;
     String fragmentTag;
     clearBackstack();
-    FragmentManager fragmentManager = getSupportFragmentManager();
     if (id == R.id.nav_my_feeds) {
       setTitle(getString(R.string.menu_drawer_my_feeds));
       fragmentToDisplay = new MyFeedsFragment();
