@@ -16,26 +16,30 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.adapters.DownloadListCursorAdapter;
 import udacity.kevin.podcastmaster.data.PodcastContract;
 import udacity.kevin.podcastmaster.listeners.RecyclerViewItemClickListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
+import udacity.kevin.podcastmaster.models.PMEpisode;
 
 public class DownloadListFragment extends Fragment
 	implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private final String LOG_TAG = "DownloadListFragment";
 	private final int LOADER_ID_DOWNLOADS = 0;
-	private final int LOADER_ID_CHANNELS= 1;
+	private final int LOADER_ID_CHANNELS = 1;
 	public static final String FRAGMENT_TAG = "EpisodeListFragment";
 	private Cursor mCurrentDownloadListCursor;
 	private DownloadListCursorAdapter mDownloadListCursorAdapter;
-	private LongSparseArray<PMChannel> channelLongSparseArray = new LongSparseArray<>();
+	private LongSparseArray<PMChannel> mChannelLongSparseArray = new LongSparseArray<>();
+	private View mEmptyView;
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mDownloadListCursorAdapter = new DownloadListCursorAdapter(getActivity(), null);
+		mDownloadListCursorAdapter = new DownloadListCursorAdapter(getActivity(), null,
+			mChannelLongSparseArray);
 		getLoaderManager().initLoader(LOADER_ID_CHANNELS, null, this);
 		getLoaderManager().initLoader(LOADER_ID_DOWNLOADS, null, this);
 	}
@@ -53,12 +57,15 @@ public class DownloadListFragment extends Fragment
 			new RecyclerViewItemClickListener.OnItemClickListener() {
 				@Override
 				public void onItemClick(View v, int position) {
-//						mCurrentEpisodeListCursor.moveToPosition(modifiedPosition);
-//						PMEpisode pmEpisode = new PMEpisode(mCurrentEpisodeListCursor);
-//						MainActivity mainActivity = (MainActivity) getActivity();
-//						mainActivity.episodeSelected(pmEpisode, mPMChannel);
+					mCurrentDownloadListCursor.moveToPosition(position);
+					PMEpisode pmEpisode = new PMEpisode(mCurrentDownloadListCursor);
+					PMChannel pmChannel = mChannelLongSparseArray.get(pmEpisode.getChannelID());
+					MainActivity mainActivity = (MainActivity) getActivity();
+					mainActivity.episodeSelected(pmEpisode, pmChannel, false);
 				}
 			}));
+
+		mEmptyView = rootView.findViewById(R.id.empty_view);
 
 		return rootView;
 	}
@@ -80,7 +87,7 @@ public class DownloadListFragment extends Fragment
 				null,
 				null);
 		} else {
-			return new CursorLoader(getActivity(), PodcastContract.ChannelEntry.CONTENT_URI, new String[] {
+			return new CursorLoader(getActivity(), PodcastContract.ChannelEntry.CONTENT_URI, new String[]{
 				PodcastContract.ChannelEntry._ID,
 				PodcastContract.ChannelEntry.COLUMN_TITLE,
 				PodcastContract.ChannelEntry.COLUMN_DESCRIPTION,
@@ -96,12 +103,13 @@ public class DownloadListFragment extends Fragment
 		if (loader.getId() == LOADER_ID_DOWNLOADS) {
 			mCurrentDownloadListCursor = data;
 			mDownloadListCursorAdapter.swapCursor(mCurrentDownloadListCursor);
+			updateEmptyView();
 		} else {
-			channelLongSparseArray.clear();
+			mChannelLongSparseArray.clear();
 			data.moveToFirst();
 			while (!data.isAfterLast()) {
 				PMChannel pmChannel = new PMChannel(data);
-				channelLongSparseArray.append(pmChannel.getID(), pmChannel);
+				mChannelLongSparseArray.append(pmChannel.getID(), pmChannel);
 				data.moveToNext();
 			}
 		}
@@ -110,5 +118,13 @@ public class DownloadListFragment extends Fragment
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		Log.d(LOG_TAG, "Loader reset");
+	}
+
+	private void updateEmptyView() {
+		if (mCurrentDownloadListCursor == null || mCurrentDownloadListCursor.getCount() == 0) {
+			mEmptyView.setVisibility(View.VISIBLE);
+		} else {
+			mEmptyView.setVisibility(View.GONE);
+		}
 	}
 }

@@ -94,10 +94,13 @@ public class MainActivity extends AppCompatActivity
 
 
     FragmentManager fragmentManager = getSupportFragmentManager();
-    MyFeedsFragment myFeedsFragment = (MyFeedsFragment) fragmentManager
-      .findFragmentByTag(MyFeedsFragment.FRAGMENT_TAG);
-    if (myFeedsFragment == null) {
-      myFeedsFragment = new MyFeedsFragment();
+    Fragment fragmentCheck = masterDetailLayoutAvailable ?
+      fragmentManager.findFragmentById(R.id.fragment_container_master) :
+      fragmentManager.findFragmentById(R.id.fragment_container);
+
+    if (fragmentCheck == null) {
+      setTitle(getString(R.string.menu_drawer_my_feeds));
+      MyFeedsFragment myFeedsFragment = new MyFeedsFragment();
       int containerIDToAddTo =
         masterDetailLayoutAvailable ? R.id.fragment_container_master : R.id.fragment_container;
       FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -225,7 +228,7 @@ public class MainActivity extends AppCompatActivity
     fragmentTransaction.commit();
   }
 
-  public void episodeSelected(PMEpisode pmEpisode, PMChannel pmChannel) {
+  public void episodeSelected(PMEpisode pmEpisode, PMChannel pmChannel, boolean addToBackstack) {
     // Todo: Handle tablet layout
     FragmentManager fragmentManager = getSupportFragmentManager();
     mEpisodeDetailFragment = new EpisodeDetailFragment();
@@ -237,12 +240,17 @@ public class MainActivity extends AppCompatActivity
     if (masterDetailLayoutAvailable) {
       fragmentTransaction.replace(R.id.fragment_container_detail,
         mEpisodeDetailFragment, EpisodeDetailFragment.FRAGMENT_TAG);
+      detailFragmentContainer.setVisibility(View.VISIBLE);
+
+      if (addToBackstack) {
+        fragmentTransaction.addToBackStack(null);
+      }
     } else {
       fragmentTransaction.replace(R.id.fragment_container,
         mEpisodeDetailFragment, EpisodeDetailFragment.FRAGMENT_TAG);
+      fragmentTransaction.addToBackStack(null);
     }
 
-    fragmentTransaction.addToBackStack(null);
     fragmentTransaction.commit();
   }
 
@@ -252,9 +260,11 @@ public class MainActivity extends AppCompatActivity
     clearBackstack();
     FragmentManager fragmentManager = getSupportFragmentManager();
     if (id == R.id.nav_my_feeds) {
+      setTitle(getString(R.string.menu_drawer_my_feeds));
       fragmentToDisplay = new MyFeedsFragment();
       fragmentTag = MyFeedsFragment.FRAGMENT_TAG;
     } else {
+      setTitle(getString(R.string.menu_drawer_my_downloads));
       fragmentToDisplay = new DownloadListFragment();
       fragmentTag = DownloadListFragment.FRAGMENT_TAG;
     }

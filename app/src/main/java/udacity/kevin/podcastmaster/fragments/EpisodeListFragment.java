@@ -57,7 +57,7 @@ public class EpisodeListFragment extends Fragment
             mCurrentEpisodeListCursor.moveToPosition(modifiedPosition);
             PMEpisode pmEpisode = new PMEpisode(mCurrentEpisodeListCursor);
             MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.episodeSelected(pmEpisode, mPMChannel);
+            mainActivity.episodeSelected(pmEpisode, mPMChannel, true);
           }
         }
       }));

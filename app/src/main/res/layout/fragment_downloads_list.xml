@@ -20,7 +20,7 @@
 		android:gravity="center"
 		android:layout_alignParentTop="true"
 		android:layout_centerHorizontal="true"
-		android:text="@string/my_feeds_empty_string"
+		android:text="@string/my_downloads_empty_string"
 		android:visibility="gone"/>
 
 	<android.support.v7.widget.RecyclerView
