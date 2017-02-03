@@ -165,8 +165,9 @@ public class PodcastCRUDHelper {
     Cursor downloadCursor = contentResolver.query(PodcastContract.EpisodeEntry.CONTENT_URI,
       new String[]{PodcastContract.EpisodeEntry._ID,
         PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI},
-      PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI + " IS NOT NULL",
-      null, null);
+      PodcastContract.EpisodeEntry.COLUMN_DOWNLOADED_MEDIA_URI + " IS NOT NULL AND " +
+      PodcastContract.EpisodeEntry.COLUMN_CHANNEL_ID + " = ?",
+      new String[] {String.valueOf(pmChannel.getID())}, null);
     if (downloadCursor != null) {
       downloadCursor.moveToFirst();
       while(!downloadCursor.isAfterLast()) {

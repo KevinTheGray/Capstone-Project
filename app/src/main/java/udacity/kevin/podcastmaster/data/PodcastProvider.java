@@ -126,6 +126,13 @@ public class PodcastProvider extends ContentProvider {
     } else {
       throw new UnsupportedOperationException("Unknown uri: " + uri);
     }
+    if (deletedCount != 0) {
+      Context context = getContext();
+      if (context != null) {
+        context.getContentResolver().notifyChange(PodcastContract.ChannelEntry.CONTENT_URI, null);
+				context.getContentResolver().notifyChange(PodcastContract.EpisodeEntry.CONTENT_URI, null);
+      }
+    }
     return deletedCount;
   }
 
