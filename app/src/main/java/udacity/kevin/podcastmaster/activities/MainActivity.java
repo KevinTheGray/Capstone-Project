@@ -2,18 +2,27 @@ package udacity.kevin.podcastmaster.activities;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.media.session.MediaController;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +33,8 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import java.io.File;
+
 import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.fragments.DownloadListFragment;
@@ -33,9 +44,13 @@ import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
 import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
+import udacity.kevin.podcastmaster.services.MediaPlayerService;
 
 public class MainActivity extends AppCompatActivity
   implements NavigationView.OnNavigationItemSelectedListener {
+
+	private static final int STATE_PAUSED = 0;
+	private static final int STATE_PLAYING = 1;
 
   private Tracker mTracker;
   InterstitialAd mInterstitialAd;
@@ -47,6 +62,51 @@ public class MainActivity extends AppCompatActivity
   private DownloadRequestListener mDownloadRequestListener;
   private boolean masterDetailLayoutAvailable = false;
   private View detailFragmentContainer = null;
+	private int mCurrentState;
+	private MediaController mMediaController;
+	private MediaBrowserCompat mMediaBrowserCompat;
+	private MediaControllerCompat mMediaControllerCompat;
+
+	private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback
+		= new MediaBrowserCompat.ConnectionCallback() {
+
+		@Override
+		public void onConnected() {
+			super.onConnected();
+			try {
+				mMediaControllerCompat = new MediaControllerCompat(MainActivity.this,
+					mMediaBrowserCompat.getSessionToken());
+				mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
+				MediaControllerCompat.setMediaController(MainActivity.this, mMediaControllerCompat);
+				buildTransportControls();
+
+			} catch( RemoteException e ) {
+				Log.e(LOG_TAG, e.getMessage());
+			}
+		}
+	};
+
+	private MediaControllerCompat.Callback mMediaControllerCompatCallback = new MediaControllerCompat.Callback() {
+
+		@Override
+		public void onPlaybackStateChanged(PlaybackStateCompat state) {
+			super.onPlaybackStateChanged(state);
+			if( state == null ) {
+				return;
+			}
+
+			switch( state.getState() ) {
+				case PlaybackStateCompat.STATE_PLAYING: {
+					mCurrentState = STATE_PLAYING;
+					break;
+				}
+				case PlaybackStateCompat.STATE_PAUSED: {
+					mCurrentState = STATE_PAUSED;
+					break;
+				}
+			}
+		}
+	};
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +114,10 @@ public class MainActivity extends AppCompatActivity
     setContentView(R.layout.activity_main);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+
+		mMediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this,
+			MediaPlayerService.class), mMediaBrowserCompatConnectionCallback,
+			null);
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -121,7 +185,15 @@ public class MainActivity extends AppCompatActivity
 
   }
 
-  @Override
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if (!mMediaBrowserCompat.isConnected()) {
+			mMediaBrowserCompat.connect();
+		}
+	}
+
+	@Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
@@ -161,7 +233,18 @@ public class MainActivity extends AppCompatActivity
     return super.onOptionsItemSelected(item);
   }
 
-  @SuppressWarnings("StatementWithEmptyBody")
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		// (see "stay in sync with the MediaSession")
+		if (MediaControllerCompat.getMediaController(MainActivity.this) != null) {
+			MediaControllerCompat.getMediaController(MainActivity.this)
+				.unregisterCallback(mMediaControllerCompatCallback);
+		}
+		mMediaBrowserCompat.disconnect();
+	}
+
+	@SuppressWarnings("StatementWithEmptyBody")
   @Override
   public boolean onNavigationItemSelected(@NonNull MenuItem item) {
     // Handle navigation view item clicks here.
@@ -288,6 +371,15 @@ public class MainActivity extends AppCompatActivity
     }
   }
 
+	public void playEpisode(PMEpisode pmEpisode) {
+		File file = new File(getFilesDir(), pmEpisode.getDownloadedMediaFilename());
+		Uri uri = Uri.fromFile(file);
+		MediaControllerCompat.getMediaController(this).getTransportControls()
+			.playFromUri(uri, null);
+		MediaControllerCompat.getMediaController(this).getTransportControls().play();
+
+	}
+
   public void showAd(DownloadRequestListener downloadRequestListener) {
     if (mInterstitialAd.isLoaded()) {
       mDownloadRequestListener = downloadRequestListener;
@@ -304,5 +396,16 @@ public class MainActivity extends AppCompatActivity
         .getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
   }
+
+	private void buildTransportControls() {
+		mMediaControllerCompat = MediaControllerCompat.getMediaController(MainActivity.this);
+
+		// Display the initial state
+		MediaMetadataCompat metadata = mMediaControllerCompat.getMetadata();
+		PlaybackStateCompat pbState = mMediaControllerCompat.getPlaybackState();
+
+		// Register a Callback to stay in sync
+		mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
+	}
 
 }

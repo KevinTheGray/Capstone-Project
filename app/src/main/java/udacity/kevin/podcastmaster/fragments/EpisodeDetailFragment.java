@@ -26,7 +26,6 @@ import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
 import udacity.kevin.podcastmaster.networking.downloadcontent.DownloadEpisodeReceiver;
 import udacity.kevin.podcastmaster.networking.downloadcontent.DownloadEpisodeService;
-import udacity.kevin.podcastmaster.services.MediaPlayerService;
 
 public class EpisodeDetailFragment extends Fragment implements DownloadRequestListener,
   DownloadEpisodeReceiver.DownloadEpisodeReceiverCallback {
@@ -137,11 +136,8 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
   }
 
   public void onPlayButtonClicked(View v) {
-    Intent intent = new Intent(getContext(), MediaPlayerService.class);
-    intent.setAction(MediaPlayerService.ACTION_PLAY);
-    intent.putExtra(MediaPlayerService.INTENT_EXTRA_KEY_FILENAME,
-      mPMEpisode.getDownloadedMediaFilename());
-    getContext().startService(intent);
+    MainActivity mainActivity = (MainActivity) getActivity();
+    mainActivity.playEpisode(mPMEpisode);
   }
 
   @Override
