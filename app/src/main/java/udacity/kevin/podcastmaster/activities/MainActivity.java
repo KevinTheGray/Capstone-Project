@@ -21,11 +21,13 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SeekBar;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity
 	private MediaController mMediaController;
 	private MediaBrowserCompat mMediaBrowserCompat;
 	private MediaControllerCompat mMediaControllerCompat;
+	private AppCompatSeekBar seekBar;
 
 	private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback
 		= new MediaBrowserCompat.ConnectionCallback() {
@@ -172,6 +175,24 @@ public class MainActivity extends AppCompatActivity
         .add(containerIDToAddTo, myFeedsFragment, MyFeedsFragment.FRAGMENT_TAG);
       fragmentTransaction.commit();
     }
+
+		seekBar = (AppCompatSeekBar) findViewById(R.id.seek_bar_media);
+		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+
+			}
+		});
   }
 
   @Override
