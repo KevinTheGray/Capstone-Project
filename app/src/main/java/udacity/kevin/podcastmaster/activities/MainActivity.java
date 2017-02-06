@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -36,6 +37,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import java.io.File;
+import java.util.Locale;
 
 import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity
 	private MediaBrowserCompat mMediaBrowserCompat;
 	private MediaControllerCompat mMediaControllerCompat;
 	private AppCompatSeekBar seekBar;
+	private TextView currentlyPlayingTextView;
+	private TextView currentDurationTextView;
+	private TextView totalDurationTextView;
 
 	private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback
 		= new MediaBrowserCompat.ConnectionCallback() {
@@ -89,7 +94,33 @@ public class MainActivity extends AppCompatActivity
 		}
 	};
 
-	private MediaControllerCompat.Callback mMediaControllerCompatCallback = new MediaControllerCompat.Callback() {
+	private MediaControllerCompat.Callback mMediaControllerCompatCallback =
+		new MediaControllerCompat.Callback() {
+
+		@Override
+		public void onMetadataChanged(MediaMetadataCompat metadata) {
+			super.onMetadataChanged(metadata);
+			String feedTitle = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
+			String episodeTitle = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+			currentlyPlayingTextView.setText(feedTitle + ": " + episodeTitle);
+			long duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+			currentDurationTextView
+				.setText(String.format(Locale.ENGLISH, "%02d:%02d:%02d", 0, 0, 0));
+			if (duration > 3600000) {
+				long hours = duration/3600000;
+				long minutes = ((duration % 3600000)/60000);
+				long seconds = ((duration % 3600000) % 60000 / 1000);
+				totalDurationTextView
+					.setText(String.format(Locale.ENGLISH, "%02d:%02d:%02d", hours, minutes, seconds));
+				Log.d(LOG_TAG, hours+":"+minutes+":"+seconds);
+			} else {
+				long minutes = duration/60000;
+				long seconds = (duration % 60000/1000);
+				totalDurationTextView
+					.setText(String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds));
+				Log.d(LOG_TAG, minutes+":"+seconds);
+			}
+		}
 
 		@Override
 		public void onPlaybackStateChanged(PlaybackStateCompat state) {
@@ -100,6 +131,9 @@ public class MainActivity extends AppCompatActivity
 
 			switch( state.getState() ) {
 				case PlaybackStateCompat.STATE_PLAYING: {
+					long duration = MediaControllerCompat.getMediaController(MainActivity.this).getMetadata()
+						.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+					Log.d(LOG_TAG, "" + duration);
 					mCurrentState = STATE_PLAYING;
 					break;
 				}
@@ -180,7 +214,7 @@ public class MainActivity extends AppCompatActivity
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				
+				Log.d(LOG_TAG, progress + "");
 			}
 
 			@Override
@@ -193,6 +227,10 @@ public class MainActivity extends AppCompatActivity
 
 			}
 		});
+
+		currentlyPlayingTextView = (TextView) findViewById(R.id.text_view_currently_playing);
+		currentDurationTextView = (TextView) findViewById(R.id.text_view_current_duration);
+		totalDurationTextView = (TextView) findViewById(R.id.text_view_total_duration);
   }
 
   @Override
@@ -392,13 +430,15 @@ public class MainActivity extends AppCompatActivity
     }
   }
 
-	public void playEpisode(PMEpisode pmEpisode) {
+	public void playEpisode(PMChannel pmChannel, PMEpisode pmEpisode) {
 		File file = new File(getFilesDir(), pmEpisode.getDownloadedMediaFilename());
 		Uri uri = Uri.fromFile(file);
+		Bundle bundle = new Bundle();
+		bundle.putString(MediaMetadataCompat.METADATA_KEY_TITLE, pmEpisode.getTitle());
+		bundle.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, pmChannel.getTitle());
 		MediaControllerCompat.getMediaController(this).getTransportControls()
-			.playFromUri(uri, null);
+			.playFromUri(uri, bundle);
 		MediaControllerCompat.getMediaController(this).getTransportControls().play();
-
 	}
 
   public void showAd(DownloadRequestListener downloadRequestListener) {

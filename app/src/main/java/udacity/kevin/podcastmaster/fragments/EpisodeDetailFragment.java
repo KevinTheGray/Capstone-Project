@@ -76,6 +76,7 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     mDownloadDetailMessage = (TextView) rootView.findViewById(R.id.text_view_download_message);
 
     Glide.with(getActivity()).load(mPMChannel.getImageURL()).into(imageView);
+
     episodeTitleTextView.setText(Html.fromHtml(mPMEpisode.getTitle()).toString());
     episodePubDateTextView.setText(mPMEpisode.getPubDate());
     if (mPMEpisode.getDuration() != null) {
@@ -137,7 +138,7 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
 
   public void onPlayButtonClicked(View v) {
     MainActivity mainActivity = (MainActivity) getActivity();
-    mainActivity.playEpisode(mPMEpisode);
+    mainActivity.playEpisode(mPMChannel, mPMEpisode);
   }
 
   @Override

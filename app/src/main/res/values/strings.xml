@@ -61,6 +61,8 @@
 	<string name="episode_download_progress_dialog_unknown_percentage">Downloading episode, unable to determine percentage (blame the podcast provider), but it\'s downloading&#8230;%1$s bytes</string>
 	<string name="episode_download_only_one_allowed">You can only donwload one episode at a time!  Currently downloading %1$s!</string>
 
+	<string name="media_player_hours_duration"></string>
+
 	<!-- Generic strings used everywhere -->
 	<string name="OK">OK</string>
 	<string name="cancel">Cancel</string>

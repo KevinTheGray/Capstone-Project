@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -85,44 +84,14 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 				initMediaPlayer();
 
 				mMediaPlayer.setDataSource(MediaPlayerService.this, uri);
-				initMediaSessionMetadata();
 				mMediaPlayer.prepare();
+				initMediaSessionMetadata(extras);
 			} catch (IOException ioException) {
 				Log.e(LOG_TAG, ioException.getMessage());
 			}
 
 		}
 
-		@Override
-		public void onPlayFromMediaId(String mediaId, Bundle extras) {
-			super.onPlayFromMediaId(mediaId, extras);
-
-			try {
-				AssetFileDescriptor afd = getResources().openRawResourceFd(Integer.valueOf(mediaId));
-				if( afd == null ) {
-					return;
-				}
-
-				try {
-					mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-
-				} catch( IllegalStateException e ) {
-					mMediaPlayer.release();
-					initMediaPlayer();
-					mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-				}
-
-				afd.close();
-				initMediaSessionMetadata();
-
-			} catch (IOException e) {
-				return;
-			}
-
-			try {
-				mMediaPlayer.prepare();
-			} catch (IOException e) {}
-		}
 	};
 
 	public final static String ACTION_PLAY = "udacity.kevin.podcastmaster.ACTION_PLAY";
@@ -197,7 +166,7 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 		return null;
 	}
 
-	private void initMediaSessionMetadata() {
+	private void initMediaSessionMetadata(Bundle extras) {
 		MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
 		//Notification icon in card
 		metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
@@ -205,8 +174,14 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 
 		//lock screen icon for pre lollipop
 		metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
-		metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "Album");
-		metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, "Display Subtitle");
+		metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM,
+			extras.getString(MediaMetadataCompat.METADATA_KEY_ALBUM));
+		metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE,
+			extras.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
+
+		metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
+			mMediaPlayer.getDuration());
+
 
 		mMediaSessionCompat.setMetadata(metadataBuilder.build());
 	}
