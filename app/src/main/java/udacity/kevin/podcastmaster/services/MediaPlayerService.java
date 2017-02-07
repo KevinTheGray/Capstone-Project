@@ -34,7 +34,7 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 	MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 
 	private static String LOG_TAG = "MediaPlayerService";
-	private MediaPlayer mMediaPlayer;
+	public static MediaPlayer mMediaPlayer;
 	private MediaSessionCompat mMediaSessionCompat;
 
 	private BroadcastReceiver mNoisyReceiver = new BroadcastReceiver() {
@@ -90,6 +90,11 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 				Log.e(LOG_TAG, ioException.getMessage());
 			}
 
+		}
+
+		@Override
+		public void onSeekTo(long pos) {
+			mMediaPlayer.seekTo((int)pos);
 		}
 
 	};
@@ -269,5 +274,6 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 				break;
 			}
 		}
+
 	}
 }
