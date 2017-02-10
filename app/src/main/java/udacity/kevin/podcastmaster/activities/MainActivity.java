@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity
 
 	private static final int STATE_PAUSED = 0;
 	private static final int STATE_PLAYING = 1;
+	private static final int STATE_STOPPED = 2;
 
 	private Tracker mTracker;
 	InterstitialAd mInterstitialAd;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity
 	private DownloadRequestListener mDownloadRequestListener;
 	private boolean masterDetailLayoutAvailable = false;
 	private View detailFragmentContainer = null;
-	private int mCurrentState;
+	private int mCurrentState = STATE_STOPPED;
 	private MediaController mMediaController;
 	private MediaBrowserCompat mMediaBrowserCompat;
 	private MediaControllerCompat mMediaControllerCompat;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity
 	private TextView mCurrentlyPlayingTextView;
 	private TextView mCurrentDurationTextView;
 	private TextView mTotalDurationTextView;
+	private ImageButton mPlayControlButton;
 	private boolean mCurrentDurationGreaterThanAnHour = false;
 	private PlaybackStateCompat mLastPlaybackState;
 
@@ -139,11 +142,13 @@ public class MainActivity extends AppCompatActivity
 						Log.d(LOG_TAG, "" + duration);
 						mCurrentState = STATE_PLAYING;
 						scheduleSeekbarUpdate();
+						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_pause_white_24dp));
 						break;
 					}
 					case PlaybackStateCompat.STATE_PAUSED: {
 						stopSeekbarUpdate();
 						mCurrentState = STATE_PAUSED;
+						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_white_24dp));
 						break;
 					}
 				}
@@ -240,6 +245,19 @@ public class MainActivity extends AppCompatActivity
 		mCurrentlyPlayingTextView = (TextView) findViewById(R.id.text_view_currently_playing);
 		mCurrentDurationTextView = (TextView) findViewById(R.id.text_view_current_duration);
 		mTotalDurationTextView = (TextView) findViewById(R.id.text_view_total_duration);
+		mPlayControlButton = (ImageButton) findViewById(R.id.button_play_control);
+		mPlayControlButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mCurrentState == STATE_PLAYING) {
+					MediaControllerCompat.getMediaController(MainActivity.this)
+						.getTransportControls().pause();
+				} else {
+					MediaControllerCompat.getMediaController(MainActivity.this)
+						.getTransportControls().play();
+				}
+			}
+		});
 	}
 
 	@Override
