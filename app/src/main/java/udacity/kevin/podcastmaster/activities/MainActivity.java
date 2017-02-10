@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity
 	private MediaBrowserCompat mMediaBrowserCompat;
 	private MediaControllerCompat mMediaControllerCompat;
 	private AppCompatSeekBar mSeekBar;
+	private View mMediaPlayerView;
 	private TextView mCurrentlyPlayingTextView;
 	private TextView mCurrentDurationTextView;
 	private TextView mTotalDurationTextView;
@@ -140,6 +141,9 @@ public class MainActivity extends AppCompatActivity
 						long duration = MediaControllerCompat.getMediaController(MainActivity.this).getMetadata()
 							.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
 						Log.d(LOG_TAG, "" + duration);
+						if (mMediaPlayerView.getVisibility() != View.VISIBLE) {
+							mMediaPlayerView.setVisibility(View.VISIBLE);
+						}
 						mCurrentState = STATE_PLAYING;
 						scheduleSeekbarUpdate();
 						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_pause_white_24dp));
@@ -148,6 +152,12 @@ public class MainActivity extends AppCompatActivity
 					case PlaybackStateCompat.STATE_PAUSED: {
 						stopSeekbarUpdate();
 						mCurrentState = STATE_PAUSED;
+						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_white_24dp));
+						break;
+					}
+					case PlaybackStateCompat.STATE_STOPPED: {
+						stopSeekbarUpdate();
+						mCurrentState = STATE_STOPPED;
 						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_white_24dp));
 						break;
 					}
@@ -246,6 +256,7 @@ public class MainActivity extends AppCompatActivity
 		mCurrentDurationTextView = (TextView) findViewById(R.id.text_view_current_duration);
 		mTotalDurationTextView = (TextView) findViewById(R.id.text_view_total_duration);
 		mPlayControlButton = (ImageButton) findViewById(R.id.button_play_control);
+		mMediaPlayerView = findViewById(R.id.view_media_player);
 		mPlayControlButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

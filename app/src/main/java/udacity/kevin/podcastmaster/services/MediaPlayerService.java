@@ -31,7 +31,8 @@ import java.util.List;
 import udacity.kevin.podcastmaster.R;
 
 public class MediaPlayerService extends MediaBrowserServiceCompat implements
-	MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
+	MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener,
+	MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener {
 
 	private static String LOG_TAG = "MediaPlayerService";
 	public static MediaPlayer mMediaPlayer;
@@ -71,6 +72,12 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 				setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
 				showPausedNotification();
 			}
+		}
+
+		@Override
+		public void onStop() {
+			super.onStop();
+			setMediaPlaybackState(PlaybackStateCompat.STATE_STOPPED);
 		}
 
 		@Override
@@ -119,6 +126,9 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 		mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 		mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		mMediaPlayer.setVolume(1.0f, 1.0f);
+		mMediaPlayer.setOnErrorListener(this);
+		mMediaPlayer.setOnSeekCompleteListener(this);
+		mMediaPlayer.setOnCompletionListener(this);
 	}
 
 	private void initMediaSession() {
@@ -240,9 +250,7 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		if( mMediaPlayer != null ) {
-			mMediaPlayer.release();
-		}
+		mMediaSessionCompat.getController().getTransportControls().stop();
 	}
 
 	@Override
@@ -274,6 +282,15 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 				break;
 			}
 		}
+	}
 
+	@Override
+	public boolean onError(MediaPlayer mp, int what, int extra) {
+		return false;
+	}
+
+	@Override
+	public void onSeekComplete(MediaPlayer mp) {
+		Log.d(LOG_TAG, "" + mp.isPlaying());
 	}
 }

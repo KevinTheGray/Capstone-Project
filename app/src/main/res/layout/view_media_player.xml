@@ -3,6 +3,7 @@
 				xmlns:android="http://schemas.android.com/apk/res/android"
 				android:layout_width="match_parent"
 				android:layout_height="140dp"
+				android:visibility="gone"
 				android:background="@color/colorPrimary">
 	<View
 		android:id="@+id/view_divider"
@@ -43,13 +44,6 @@
 			android:layout_height="match_parent"
 			android:layout_weight="1"
 		/>
-		<ImageButton android:id="@+id/button_previous_control"
-					 android:layout_width="wrap_content"
-					 android:layout_height="wrap_content"
-					 android:background="#00000000"
-					 android:contentDescription="@string/content_description_previous_control_button"
-					 android:src="@drawable/ic_replay_10_white_24dp"
-		/>
 		<ImageButton
 			android:id="@+id/button_play_control"
 			android:layout_width="wrap_content"
@@ -60,13 +54,6 @@
 			android:contentDescription="@string/content_description_play_control_button"
 			android:src="@drawable/ic_pause_white_24dp"/>
 
-		<ImageButton android:id="@+id/button_next_control"
-					 android:layout_width="wrap_content"
-					 android:layout_height="wrap_content"
-					 android:background="#00000000"
-					 android:contentDescription="@string/content_description_previous_control_button"
-					 android:src="@drawable/ic_forward_10_white_24dp"
-		/>
 		<View
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
