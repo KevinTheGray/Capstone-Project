@@ -291,6 +291,5 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 
 	@Override
 	public void onSeekComplete(MediaPlayer mp) {
-		Log.d(LOG_TAG, "" + mp.isPlaying());
 	}
 }

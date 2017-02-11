@@ -62,12 +62,14 @@ public class MainActivity extends AppCompatActivity
 	private static final int STATE_PAUSED = 0;
 	private static final int STATE_PLAYING = 1;
 	private static final int STATE_STOPPED = 2;
-
-	private Tracker mTracker;
-	InterstitialAd mInterstitialAd;
 	private final String LOG_TAG = "MainActivity";
 	private final String SCREEN_NAME = "MainActivity";
 	private final String SHOW_DETAIL_KEY = "SHOW_DETAIL_KEY";
+	private final String SHOW_MEDIA_PLAYER_KEY = "SHOW_MEDIA_PLAYER_KEY";
+	private final String CURRENT_DURATION_KEY = "CURRENT_DURATION_KEY";
+
+	private Tracker mTracker;
+	InterstitialAd mInterstitialAd;
 	private static final long PROGRESS_UPDATE_INTERNAL = 1000;
 	private static final long PROGRESS_UPDATE_INITIAL_INTERVAL = 100;
 	private EpisodeListFragment mEpisodeListFragment;
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity
 	private ImageButton mPlayControlButton;
 	private boolean mCurrentDurationGreaterThanAnHour = false;
 	private PlaybackStateCompat mLastPlaybackState;
+	private int mSavedInstanceStateCurrentDuration;
 
 	private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback
 		= new MediaBrowserCompat.ConnectionCallback() {
@@ -101,6 +104,28 @@ public class MainActivity extends AppCompatActivity
 				MediaControllerCompat.setMediaController(MainActivity.this, mMediaControllerCompat);
 				buildTransportControls();
 
+				MediaMetadataCompat mediaMetadataCompat = mMediaControllerCompat.getMetadata();
+				if (mediaMetadataCompat != null) {
+					updateForCurrentMetadata(mediaMetadataCompat);
+				}
+
+				PlaybackStateCompat currentPlaybackState = mMediaControllerCompat.getPlaybackState();
+				if (currentPlaybackState != null) {
+					if (mSavedInstanceStateCurrentDuration != 0) {
+						mSeekBar.setProgress(mSavedInstanceStateCurrentDuration);
+					}
+					mSavedInstanceStateCurrentDuration = 0;
+				  if (currentPlaybackState.getState() == PlaybackStateCompat.STATE_PLAYING) {
+						mCurrentState = STATE_PLAYING;
+						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_pause_white_24dp));
+						scheduleSeekbarUpdate();
+					} else if (currentPlaybackState.getState() == PlaybackStateCompat.STATE_PAUSED) {
+						mCurrentState = STATE_PAUSED;
+						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_white_24dp));
+					}
+				}
+
+
 			} catch (RemoteException e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}
@@ -113,15 +138,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onMetadataChanged(MediaMetadataCompat metadata) {
 				super.onMetadataChanged(metadata);
-				String feedTitle = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
-				String episodeTitle = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
-				mCurrentlyPlayingTextView.setText(feedTitle + ": " + episodeTitle);
-				long duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-				mSeekBar.setMax((int)duration);
-				mSeekBar.setProgress(0);
-				mCurrentDurationGreaterThanAnHour = duration > 3600000;
-				setTimerTextViewWithTimeMS(mCurrentDurationTextView, 0);
-				setTimerTextViewWithTimeMS(mTotalDurationTextView, (int)duration);
+				updateForCurrentMetadata(metadata);
 			}
 
 			@Override
@@ -140,7 +157,6 @@ public class MainActivity extends AppCompatActivity
 					case PlaybackStateCompat.STATE_PLAYING: {
 						long duration = MediaControllerCompat.getMediaController(MainActivity.this).getMetadata()
 							.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-						Log.d(LOG_TAG, "" + duration);
 						if (mMediaPlayerView.getVisibility() != View.VISIBLE) {
 							mMediaPlayerView.setVisibility(View.VISIBLE);
 						}
@@ -269,6 +285,13 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
+
+		if (savedInstanceState != null) {
+			if (savedInstanceState.getBoolean(SHOW_MEDIA_PLAYER_KEY, false)) {
+				mMediaPlayerView.setVisibility(View.VISIBLE);
+			}
+			mSavedInstanceStateCurrentDuration = savedInstanceState.getInt(CURRENT_DURATION_KEY, 0);
+		}
 	}
 
 	@Override
@@ -304,6 +327,12 @@ public class MainActivity extends AppCompatActivity
 			if (findViewById(R.id.fragment_container_detail).getVisibility() == View.VISIBLE) {
 				outState.putBoolean(SHOW_DETAIL_KEY, true);
 			}
+		}
+		if (findViewById(R.id.view_media_player).getVisibility() == View.VISIBLE) {
+			outState.putBoolean(SHOW_MEDIA_PLAYER_KEY, true);
+		}
+		if (MediaPlayerService.mMediaPlayer != null) {
+			outState.putInt(CURRENT_DURATION_KEY, MediaPlayerService.mMediaPlayer.getCurrentPosition());
 		}
 	}
 
@@ -561,5 +590,17 @@ public class MainActivity extends AppCompatActivity
 		if (mScheduleFuture != null) {
 			mScheduleFuture.cancel(false);
 		}
+	}
+
+	private void updateForCurrentMetadata(MediaMetadataCompat mediaMetadataCompat) {
+		String feedTitle = mediaMetadataCompat.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
+		String episodeTitle = mediaMetadataCompat.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+		mCurrentlyPlayingTextView.setText(feedTitle + ": " + episodeTitle);
+		long duration = mediaMetadataCompat.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+		mSeekBar.setMax((int)duration);
+		mSeekBar.setProgress(0);
+		mCurrentDurationGreaterThanAnHour = duration > 3600000;
+		setTimerTextViewWithTimeMS(mCurrentDurationTextView, 0);
+		setTimerTextViewWithTimeMS(mTotalDurationTextView, (int)duration);
 	}
 }
