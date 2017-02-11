@@ -5,14 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import udacity.kevin.podcastmaster.services.MediaPlayerService;
-
 public class WidgetBroadcastReceiver extends BroadcastReceiver {
+	public static PlayControlWidgetListener mPlayControlWidgetListener;
   @Override
   public void onReceive(Context context, Intent intent) {
     Log.d("YEAH!", intent.getAction());
-    Intent playIntent = new Intent(context, MediaPlayerService.class);
-    playIntent.setAction(MediaPlayerService.ACTION_PLAY);
-    context.startService(playIntent);
+		if (mPlayControlWidgetListener != null) {
+			mPlayControlWidgetListener.onWidgetIntentReceived(intent);
+		}
   }
+
+	public void setCallback(PlayControlWidgetListener playControlWidgetListener) {
+		mPlayControlWidgetListener = playControlWidgetListener;
+	}
+
+	public interface PlayControlWidgetListener {
+		void onWidgetIntentReceived(Intent intent);
+	}
 }

@@ -4,6 +4,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.session.MediaController;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -54,10 +57,13 @@ import udacity.kevin.podcastmaster.fragments.MyFeedsFragment;
 import udacity.kevin.podcastmaster.listeners.DownloadRequestListener;
 import udacity.kevin.podcastmaster.models.PMChannel;
 import udacity.kevin.podcastmaster.models.PMEpisode;
+import udacity.kevin.podcastmaster.receivers.WidgetBroadcastReceiver;
 import udacity.kevin.podcastmaster.services.MediaPlayerService;
+import udacity.kevin.podcastmaster.widgets.PlayControlWidgetProvider;
 
 public class MainActivity extends AppCompatActivity
-	implements NavigationView.OnNavigationItemSelectedListener {
+	implements NavigationView.OnNavigationItemSelectedListener,
+	WidgetBroadcastReceiver.PlayControlWidgetListener {
 
 	private static final int STATE_PAUSED = 0;
 	private static final int STATE_PLAYING = 1;
@@ -90,6 +96,7 @@ public class MainActivity extends AppCompatActivity
 	private boolean mCurrentDurationGreaterThanAnHour = false;
 	private PlaybackStateCompat mLastPlaybackState;
 	private int mSavedInstanceStateCurrentDuration;
+	private WidgetBroadcastReceiver mWidgetBroadcastReceiver;
 
 	private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback
 		= new MediaBrowserCompat.ConnectionCallback() {
@@ -188,6 +195,16 @@ public class MainActivity extends AppCompatActivity
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
+		IntentFilter widgetIntentFilter = new IntentFilter();
+		widgetIntentFilter.addAction(PlayControlWidgetProvider.PLAY_CONTROL_ACTION);
+		widgetIntentFilter.addAction(PlayControlWidgetProvider.SEEK_BACKWARD_ACTION);
+		widgetIntentFilter.addAction(PlayControlWidgetProvider.SEEK_FORWARD_ACTION);
+
+		mWidgetBroadcastReceiver = new WidgetBroadcastReceiver();
+		LocalBroadcastManager.getInstance(this).registerReceiver(
+			mWidgetBroadcastReceiver, widgetIntentFilter);
+		mWidgetBroadcastReceiver.setCallback(this);
+
 		mMediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this,
 			MediaPlayerService.class), mMediaBrowserCompatConnectionCallback,
 			null);
@@ -276,13 +293,7 @@ public class MainActivity extends AppCompatActivity
 		mPlayControlButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mCurrentState == STATE_PLAYING) {
-					MediaControllerCompat.getMediaController(MainActivity.this)
-						.getTransportControls().pause();
-				} else {
-					MediaControllerCompat.getMediaController(MainActivity.this)
-						.getTransportControls().play();
-				}
+				handlePlayControlButtonTap();
 			}
 		});
 
@@ -368,6 +379,8 @@ public class MainActivity extends AppCompatActivity
 				.unregisterCallback(mMediaControllerCompatCallback);
 		}
 		mMediaBrowserCompat.disconnect();
+		mWidgetBroadcastReceiver.setCallback(null);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(mWidgetBroadcastReceiver);
 	}
 
 	@SuppressWarnings("StatementWithEmptyBody")
@@ -602,5 +615,40 @@ public class MainActivity extends AppCompatActivity
 		mCurrentDurationGreaterThanAnHour = duration > 3600000;
 		setTimerTextViewWithTimeMS(mCurrentDurationTextView, 0);
 		setTimerTextViewWithTimeMS(mTotalDurationTextView, (int)duration);
+	}
+
+	@Override
+	public void onWidgetIntentReceived(Intent intent) {
+		if (intent.getAction().equals(PlayControlWidgetProvider.PLAY_CONTROL_ACTION)) {
+			handlePlayControlButtonTap();
+		} else if (intent.getAction().equals(PlayControlWidgetProvider.SEEK_BACKWARD_ACTION)) {
+			if (mMediaControllerCompat != null) {
+				PlaybackStateCompat currentPlaybackState = mMediaControllerCompat.getPlaybackState();
+				if (currentPlaybackState != null && currentPlaybackState.getState()
+					== PlaybackStateCompat.STATE_PLAYING) {
+					mMediaControllerCompat.getTransportControls()
+						.seekTo(((long)(MediaPlayerService.mMediaPlayer.getCurrentPosition() - 10000)));
+				}
+			}
+		} else if (intent.getAction().equals(PlayControlWidgetProvider.SEEK_FORWARD_ACTION)) {
+			if (mMediaControllerCompat != null) {
+				PlaybackStateCompat currentPlaybackState = mMediaControllerCompat.getPlaybackState();
+				if (currentPlaybackState != null && currentPlaybackState.getState()
+					== PlaybackStateCompat.STATE_PLAYING) {
+					mMediaControllerCompat.getTransportControls()
+						.seekTo(((long)(MediaPlayerService.mMediaPlayer.getCurrentPosition() + 10000)));
+				}
+			}
+		}
+	}
+
+	private void handlePlayControlButtonTap() {
+		if (mCurrentState == STATE_PLAYING) {
+			MediaControllerCompat.getMediaController(MainActivity.this)
+				.getTransportControls().pause();
+		} else {
+			MediaControllerCompat.getMediaController(MainActivity.this)
+				.getTransportControls().play();
+		}
 	}
 }
