@@ -52,7 +52,6 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 		@Override
 		public void onPlay() {
 			super.onPlay();
-
 			if( !successfullyRetrievedAudioFocus() ) {
 				return;
 			}
@@ -61,6 +60,7 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 			setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
 			showPlayingNotification();
 			mMediaPlayer.start();
+			startService(new Intent(getApplicationContext(), MediaPlayerService.class));
 		}
 
 		@Override
