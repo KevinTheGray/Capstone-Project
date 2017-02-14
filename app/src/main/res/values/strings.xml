@@ -13,8 +13,8 @@
 	<string name="test_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
 	<!-- Default strings -->
-	<string name="default_widget_podcast_title" translatable="true">No available media</string>
-	<string name="default_widget_episode_title" translatable="true">Download some episodes!</string>
+	<string name="default_widget_podcast_title" translatable="true">Podcast Master</string>
+	<string name="default_widget_episode_title" translatable="true">No Media Playing</string>
 
 	<!-- My Feeds -->
 	<string name="add_feed_dialog_title">Add RSS Feed</string>
@@ -60,8 +60,6 @@
 	<string name="episode_download_progress_dialog_known_percentage">Downloading now&#8230;%1$s%%</string>
 	<string name="episode_download_progress_dialog_unknown_percentage">Downloading episode, unable to determine percentage (blame the podcast provider), but it\'s downloading&#8230;%1$s bytes</string>
 	<string name="episode_download_only_one_allowed">You can only donwload one episode at a time!  Currently downloading %1$s!</string>
-
-	<string name="media_player_hours_duration"></string>
 
 	<!-- Generic strings used everywhere -->
 	<string name="OK">OK</string>

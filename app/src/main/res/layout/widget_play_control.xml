@@ -38,7 +38,7 @@
 	/>
 
 
-	<ImageButton android:id="@+id/button_play_control"
+	<ImageView android:id="@+id/button_play_control"
 				 android:layout_width="@dimen/widget_buttons_width"
 				 android:layout_height="match_parent"
 				 android:contentDescription="@string/content_description_play_control_button"

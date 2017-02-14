@@ -1,5 +1,6 @@
 package udacity.kevin.podcastmaster.activities;
 
+import android.appwidget.AppWidgetManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -32,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -162,6 +164,7 @@ public class MainActivity extends AppCompatActivity
 				mLastPlaybackState = state;
 				switch (state.getState()) {
 					case PlaybackStateCompat.STATE_PLAYING: {
+						updateWidget();
 						long duration = MediaControllerCompat.getMediaController(MainActivity.this).getMetadata()
 							.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
 						if (mMediaPlayerView.getVisibility() != View.VISIBLE) {
@@ -170,18 +173,21 @@ public class MainActivity extends AppCompatActivity
 						mCurrentState = STATE_PLAYING;
 						scheduleSeekbarUpdate();
 						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_pause_white_24dp));
+						updateWidget();
 						break;
 					}
 					case PlaybackStateCompat.STATE_PAUSED: {
 						stopSeekbarUpdate();
 						mCurrentState = STATE_PAUSED;
 						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_white_24dp));
+						updateWidget();
 						break;
 					}
 					case PlaybackStateCompat.STATE_STOPPED: {
 						stopSeekbarUpdate();
 						mCurrentState = STATE_STOPPED;
 						mPlayControlButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_white_24dp));
+						updateWidget();
 						break;
 					}
 				}
@@ -381,6 +387,7 @@ public class MainActivity extends AppCompatActivity
 		mMediaBrowserCompat.disconnect();
 		mWidgetBroadcastReceiver.setCallback(null);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(mWidgetBroadcastReceiver);
+		updateWidget();
 	}
 
 	@SuppressWarnings("StatementWithEmptyBody")
@@ -643,12 +650,41 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	private void handlePlayControlButtonTap() {
-		if (mCurrentState == STATE_PLAYING) {
-			MediaControllerCompat.getMediaController(MainActivity.this)
-				.getTransportControls().pause();
-		} else {
-			MediaControllerCompat.getMediaController(MainActivity.this)
-				.getTransportControls().play();
+		if (MediaPlayerService.mMediaPlayer != null) {
+			if (mCurrentState == STATE_PLAYING) {
+				MediaControllerCompat.getMediaController(MainActivity.this)
+					.getTransportControls().pause();
+			} else {
+				MediaControllerCompat.getMediaController(MainActivity.this)
+					.getTransportControls().play();
+			}
+			updateWidget();
+		}
+	}
+
+	private void updateWidget() {
+		Context context = this;
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+			R.layout.widget_play_control);
+		ComponentName thisWidget = new ComponentName(context, PlayControlWidgetProvider.class);
+		if (mMediaControllerCompat != null) {
+			MediaMetadataCompat mediaMetadataCompat = mMediaControllerCompat.getMetadata();
+			if (mediaMetadataCompat != null) {
+				String feedTitle = mediaMetadataCompat.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
+				String episodeTitle = mediaMetadataCompat.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+				remoteViews.setTextViewText(R.id.text_view_podcast_title, feedTitle);
+				remoteViews.setTextViewText(R.id.text_view_episode_title, episodeTitle);
+			}
+			if (mCurrentState == STATE_PLAYING) {
+				remoteViews.setImageViewResource(R.id.button_play_control,
+					R.drawable.ic_pause_white_24dp);
+			} else {
+				remoteViews.setImageViewResource(R.id.button_play_control,
+					R.drawable.ic_play_arrow_white_24dp);
+
+			}
+			appWidgetManager.updateAppWidget(thisWidget, remoteViews);
 		}
 	}
 }
