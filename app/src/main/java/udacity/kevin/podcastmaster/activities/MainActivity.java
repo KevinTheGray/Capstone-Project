@@ -627,7 +627,9 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onWidgetIntentReceived(Intent intent) {
 		if (intent.getAction().equals(PlayControlWidgetProvider.PLAY_CONTROL_ACTION)) {
-			handlePlayControlButtonTap();
+			if (MediaPlayerService.mPrepared) {
+				handlePlayControlButtonTap();
+			}
 		} else if (intent.getAction().equals(PlayControlWidgetProvider.SEEK_BACKWARD_ACTION)) {
 			if (mMediaControllerCompat != null) {
 				PlaybackStateCompat currentPlaybackState = mMediaControllerCompat.getPlaybackState();

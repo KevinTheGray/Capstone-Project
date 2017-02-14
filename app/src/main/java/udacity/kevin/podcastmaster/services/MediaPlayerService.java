@@ -36,6 +36,7 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 
 	private static String LOG_TAG = "MediaPlayerService";
 	public static MediaPlayer mMediaPlayer;
+	public static boolean mPrepared = false;
 	private MediaSessionCompat mMediaSessionCompat;
 
 	private BroadcastReceiver mNoisyReceiver = new BroadcastReceiver() {
@@ -88,10 +89,12 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements
 				mMediaPlayer.stop();
 				mMediaPlayer.release();
 				mMediaPlayer = null;
+				mPrepared = false;
 				initMediaPlayer();
 
 				mMediaPlayer.setDataSource(MediaPlayerService.this, uri);
 				mMediaPlayer.prepare();
+				mPrepared = true;
 				initMediaSessionMetadata(extras);
 			} catch (IOException ioException) {
 				Log.e(LOG_TAG, ioException.getMessage());
