@@ -387,7 +387,6 @@ public class MainActivity extends AppCompatActivity
 		mMediaBrowserCompat.disconnect();
 		mWidgetBroadcastReceiver.setCallback(null);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(mWidgetBroadcastReceiver);
-		updateWidget();
 	}
 
 	@SuppressWarnings("StatementWithEmptyBody")
@@ -671,13 +670,6 @@ public class MainActivity extends AppCompatActivity
 			R.layout.widget_play_control);
 		ComponentName thisWidget = new ComponentName(context, PlayControlWidgetProvider.class);
 		if (mMediaControllerCompat != null) {
-			MediaMetadataCompat mediaMetadataCompat = mMediaControllerCompat.getMetadata();
-			if (mediaMetadataCompat != null) {
-				String feedTitle = mediaMetadataCompat.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
-				String episodeTitle = mediaMetadataCompat.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
-				remoteViews.setTextViewText(R.id.text_view_podcast_title, feedTitle);
-				remoteViews.setTextViewText(R.id.text_view_episode_title, episodeTitle);
-			}
 			if (mCurrentState == STATE_PLAYING) {
 				remoteViews.setImageViewResource(R.id.button_play_control,
 					R.drawable.ic_pause_white_24dp);

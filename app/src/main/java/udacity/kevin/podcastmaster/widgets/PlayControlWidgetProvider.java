@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import udacity.kevin.podcastmaster.R;
+import udacity.kevin.podcastmaster.services.MediaPlayerService;
 
 import static android.app.PendingIntent.getBroadcast;
 
@@ -41,12 +42,20 @@ public class PlayControlWidgetProvider extends AppWidgetProvider {
     PendingIntent seekBackwardPendingIntent =
       PendingIntent.getBroadcast(context, 0, seekBackwardIntent, 0);
 
-      // Get the layout for the App Widget and attach an on-click listener
-      // to the button
       RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_play_control);
-      remoteViews.setOnClickPendingIntent(R.id.button_play_control, playControlPendingIntent);
-      remoteViews.setOnClickPendingIntent(R.id.button_next_control, seekForwardPendingIntent);
-      remoteViews.setOnClickPendingIntent(R.id.button_previous_control, seekBackwardPendingIntent);
+			// Get the layout for the App Widget and attach an on-click listener
+			// to the button
+			remoteViews.setOnClickPendingIntent(R.id.button_play_control, playControlPendingIntent);
+			remoteViews.setOnClickPendingIntent(R.id.button_next_control, seekForwardPendingIntent);
+			remoteViews.setOnClickPendingIntent(R.id.button_previous_control, seekBackwardPendingIntent);
+
+			// Set the button to a paused stated if needed
+			if (MediaPlayerService.mMediaPlayer != null) {
+				if (MediaPlayerService.mMediaPlayer.isPlaying()) {
+					remoteViews.setImageViewResource(R.id.button_play_control,
+						R.drawable.ic_pause_white_24dp);
+				}
+			}
 
       // Tell the AppWidgetManager to perform an update on the current app widget
       appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
