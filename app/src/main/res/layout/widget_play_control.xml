@@ -11,12 +11,12 @@
 				  android:orientation="vertical">
 
 		<TextView android:id="@+id/text_view_podcast_title"
-				  android:layout_width="wrap_content"
+				  android:layout_width="match_parent"
 				  android:layout_height="wrap_content"
 				  android:text="@string/default_widget_podcast_title"
+				  android:gravity="center"
 				  android:textColor="@color/widget_podcast_title_color"
 				  android:layout_marginStart="@dimen/widget_title_margin_start"
-				  android:maxLines="1"
 				  android:textSize="@dimen/widget_podcast_title_text"/>
 	</LinearLayout>
 

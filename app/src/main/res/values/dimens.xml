@@ -12,8 +12,8 @@
 	<dimen name="empty_view_text_size">24sp</dimen>
 
 	<!-- Widgets -->
-	<dimen name="widget_title_margin_start">4dp</dimen>
-	<dimen name="widget_podcast_title_text">18sp</dimen>
+	<dimen name="widget_title_margin_start">8dp</dimen>
+	<dimen name="widget_podcast_title_text">28sp</dimen>
 	<dimen name="widget_episode_title_text">14sp</dimen>
 	<dimen name="widget_buttons_width">40dp</dimen>
 </resources>

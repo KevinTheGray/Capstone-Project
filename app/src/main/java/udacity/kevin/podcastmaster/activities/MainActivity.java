@@ -7,7 +7,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.session.MediaController;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity
 	private boolean masterDetailLayoutAvailable = false;
 	private View detailFragmentContainer = null;
 	private int mCurrentState = STATE_STOPPED;
-	private MediaController mMediaController;
 	private MediaBrowserCompat mMediaBrowserCompat;
 	private MediaControllerCompat mMediaControllerCompat;
 	private AppCompatSeekBar mSeekBar;
@@ -96,7 +94,6 @@ public class MainActivity extends AppCompatActivity
 	private TextView mTotalDurationTextView;
 	private ImageButton mPlayControlButton;
 	private boolean mCurrentDurationGreaterThanAnHour = false;
-	private PlaybackStateCompat mLastPlaybackState;
 	private int mSavedInstanceStateCurrentDuration;
 	private WidgetBroadcastReceiver mWidgetBroadcastReceiver;
 
@@ -161,7 +158,6 @@ public class MainActivity extends AppCompatActivity
 				if (state == null) {
 					return;
 				}
-				mLastPlaybackState = state;
 				switch (state.getState()) {
 					case PlaybackStateCompat.STATE_PLAYING: {
 						updateWidget();
