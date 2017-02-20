@@ -17,7 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.analytics.Tracker;
 
+import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.data.PodcastCRUDHelper;
@@ -39,6 +41,7 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
   private Button mDownloadButton;
   private LinearLayout mDownloadedButtonBar;
   private TextView mDownloadDetailMessage;
+  private Tracker mTracker;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +57,10 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     LocalBroadcastManager.getInstance(getContext()).registerReceiver(mDownloadEpisodeReceiver,
       downloadRSSFeedIntentFilter);
     mDownloadEpisodeReceiver.setCallback(this);
+
+		// Obtain the shared Tracker instance.
+		PodcastMasterApplication application = (PodcastMasterApplication) getActivity().getApplication();
+		mTracker = application.getDefaultTracker();
   }
 
   @Nullable
@@ -126,6 +133,12 @@ public class EpisodeDetailFragment extends Fragment implements DownloadRequestLi
     MainActivity mainActivity = (MainActivity) getActivity();
     mainActivity.showAd(this);
   }
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		mTracker.setScreenName(FRAGMENT_TAG);
+	}
 
   public void onDeleteButtonClicked(View v) {
     PodcastCRUDHelper podcastCRUDHelper = new PodcastCRUDHelper(getContext().getContentResolver());

@@ -14,6 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.analytics.Tracker;
+
+import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.adapters.EpisodeListCursorAdapter;
@@ -28,6 +31,7 @@ public class EpisodeListFragment extends Fragment
   public static final String LOG_TAG = "EpisodeListFragment";
   public static final String BUNDLE_KEY_CHANNEL_PARCELABLE = "BUNDLE_KEY_PM_CHANNEL";
   public PMChannel mPMChannel;
+  private Tracker mTracker;
   private EpisodeListCursorAdapter mEpisodeListCursorAdapter;
   private Cursor mCurrentEpisodeListCursor;
 
@@ -37,6 +41,10 @@ public class EpisodeListFragment extends Fragment
     mPMChannel = getArguments().getParcelable(BUNDLE_KEY_CHANNEL_PARCELABLE);
     mEpisodeListCursorAdapter = new EpisodeListCursorAdapter(getActivity(), null, mPMChannel);
     getLoaderManager().initLoader(0, null, this);
+
+		// Obtain the shared Tracker instance.
+		PodcastMasterApplication application = (PodcastMasterApplication) getActivity().getApplication();
+		mTracker = application.getDefaultTracker();
   }
 
   @Nullable
@@ -65,7 +73,13 @@ public class EpisodeListFragment extends Fragment
     return rootView;
   }
 
-  @Override
+	@Override
+	public void onResume() {
+		super.onResume();
+		mTracker.setScreenName(FRAGMENT_TAG);
+	}
+
+	@Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
     return new CursorLoader(getActivity(), PodcastContract.EpisodeEntry.CONTENT_URI, new String[] {
       PodcastContract.EpisodeEntry._ID,

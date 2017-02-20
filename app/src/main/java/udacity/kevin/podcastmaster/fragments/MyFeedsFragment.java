@@ -24,7 +24,9 @@ import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.analytics.Tracker;
 
+import udacity.kevin.podcastmaster.PodcastMasterApplication;
 import udacity.kevin.podcastmaster.R;
 import udacity.kevin.podcastmaster.activities.MainActivity;
 import udacity.kevin.podcastmaster.adapters.ChannelCursorAdapter;
@@ -41,6 +43,7 @@ public class MyFeedsFragment extends Fragment implements
 
 	public static final String FRAGMENT_TAG = "MyFeedsFragment";
 	private final String LOG_TAG = "MyFeedsFragment";
+	private Tracker mTracker;
 	private DownloadRSSFeedReceiver mDownloadRSSFeedReceiver;
 	private ProgressDialog mDownloadRSSFeedProgressDialog;
 	private ChannelCursorAdapter mChannelCursorAdapter;
@@ -62,6 +65,16 @@ public class MyFeedsFragment extends Fragment implements
 
 		mChannelCursorAdapter = new ChannelCursorAdapter(getActivity(), null);
 		getLoaderManager().initLoader(0, null, this);
+
+		// Obtain the shared Tracker instance.
+		PodcastMasterApplication application = (PodcastMasterApplication) getActivity().getApplication();
+		mTracker = application.getDefaultTracker();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		mTracker.setScreenName(FRAGMENT_TAG);
 	}
 
 	@Nullable
